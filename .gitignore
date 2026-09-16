@@ -3,9 +3,12 @@
 # Per-machine credentials - never commit real DB/gateway secrets.
 /config/config.local.php
 
-# Uploaded part images stay local to whichever machine received them.
+# Uploaded part images
 /uploads/parts/*
 !/uploads/parts/.gitkeep
+!/uploads/parts/*.jpg
+!/uploads/parts/*.webp
+!/uploads/parts/*.png
 
 # Runtime logs (e.g. logs/mail.log from the password-reset flow).
 /logs/*
