@@ -1306,6 +1306,25 @@ input[type="radio"] {
 .home-why-icon--info    { background: var(--color-info-bg); color: var(--color-info); }
 .home-why-icon--success { background: var(--color-success-bg); color: var(--color-success); }
 
+/* Dark mode overrides for Why Shop With Us section */
+[data-theme="dark"] .home-why {
+    background: linear-gradient(180deg, #0f172a, #1e293b);
+}
+
+[data-theme="dark"] .home-why-title {
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .home-why-icon--accent {
+    background: #4a2008;
+    color: #fb923c;
+}
+
+[data-theme="dark"] .home-why-icon--primary {
+    background: #1e3a5f;
+    color: #60a5fa;
+}
+
 .home-why-title {
     font-weight: 700;
     font-size: 1rem;
