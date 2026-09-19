@@ -175,12 +175,71 @@ function catBuildWhere(array $filters): array
         $params['priceMax'] = $priceRange['max'];
     }
 
+    $make = trim((string) ($filters['make'] ?? ''));
+    $model = trim((string) ($filters['model'] ?? ''));
+    $chassis = trim((string) ($filters['chassis'] ?? ''));
+
+    if ($make !== '' || $model !== '' || $chassis !== '') {
+        $vConditions = ['pc.partID = sp.partID'];
+        if ($make !== '') {
+            $vConditions[] = 'vm.make = :vMake';
+            $params['vMake'] = $make;
+        }
+        if ($model !== '') {
+            $vConditions[] = 'vm.model = :vModel';
+            $params['vModel'] = $model;
+        }
+        if ($chassis !== '') {
+            $vConditions[] = 'vm.chassisCode = :vChassis';
+            $params['vChassis'] = $chassis;
+        }
+        $where[] = 'EXISTS (SELECT 1 FROM part_compatibility pc JOIN vehicle_model vm ON vm.vehicleID = pc.vehicleID WHERE ' . implode(' AND ', $vConditions) . ')';
+    }
+
     return [
         'sql' => implode(' AND ', $where),
         'params' => $params,
         'priceRange' => $priceRange,
         'keyword' => $keyword,
     ];
+}
+
+/** Fetches compatible vehicles for a given spare part. */
+function catPartCompatibleVehicles(PDO $db, int $partId): array
+{
+    try {
+        $stmt = $db->prepare(
+            'SELECT vm.make, vm.model, vm.chassisCode, vm.yearRange, pc.notes
+             FROM part_compatibility pc
+             JOIN vehicle_model vm ON vm.vehicleID = pc.vehicleID
+             WHERE pc.partID = ?
+             ORDER BY vm.make ASC, vm.model ASC, vm.chassisCode ASC'
+        );
+        $stmt->execute([$partId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/** Fetches distinct vehicle makes grouped by region for dropdowns. */
+function catVehicleMakes(PDO $db): array
+{
+    try {
+        $stmt = $db->query("SELECT region, make FROM vehicle_model GROUP BY region, make ORDER BY FIELD(region, 'Japanese Vehicles', 'European Vehicles', 'American Vehicles', 'Chinese Vehicles', 'Indian Vehicles', 'Korean Vehicles'), region ASC, make ASC");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $grouped = [];
+        foreach ($rows as $row) {
+            $r = $row['region'] ?: 'Other Vehicles';
+            if (!isset($grouped[$r])) {
+                $grouped[$r] = [];
+            }
+            $grouped[$r][] = $row['make'];
+        }
+        return $grouped;
+    } catch (PDOException $e) {
+        return [];
+    }
 }
 
 /** @return array{sql:string, params:array} */
@@ -369,6 +428,14 @@ function catRemoveFilterValueUrl(array $query, string $key, int $value): string
         }
     }
     unset($query['page']);
+
+    return '?' . http_build_query($query);
+}
+
+/** URL for removing all vehicle filters at once. */
+function catRemoveVehicleFilterUrl(array $query): string
+{
+    unset($query['make'], $query['model'], $query['chassis'], $query['page']);
 
     return '?' . http_build_query($query);
 }

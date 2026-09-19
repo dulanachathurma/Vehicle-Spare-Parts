@@ -139,6 +139,67 @@ function invCreatePart(PDO $db, array $data, ?string $imageFilename, int $adminI
     return (int) $db->lastInsertId();
 }
 
+/**
+ * Inserts rows into part_compatibility for each vehicleID in $vehicleIds.
+ * Uses INSERT IGNORE so duplicates are silently skipped.
+ *
+ * @param int[]  $vehicleIds
+ */
+function invSaveCompatibility(PDO $db, int $partId, array $vehicleIds): void
+{
+    if (empty($vehicleIds)) {
+        return;
+    }
+    $stmt = $db->prepare('INSERT IGNORE INTO part_compatibility (partID, vehicleID) VALUES (?, ?)');
+    foreach ($vehicleIds as $vid) {
+        $vid = (int) $vid;
+        if ($vid > 0) {
+            $stmt->execute([$partId, $vid]);
+        }
+    }
+}
+
+/** Removes all part_compatibility rows for a given part (call before re-saving on edit). */
+function invDeleteCompatibility(PDO $db, int $partId): void
+{
+    $db->prepare('DELETE FROM part_compatibility WHERE partID = ?')->execute([$partId]);
+}
+
+/**
+ * Returns the vehicleIDs currently linked to a part.
+ *
+ * @return int[]
+ */
+function invGetCompatibility(PDO $db, int $partId): array
+{
+    $stmt = $db->prepare('SELECT vehicleID FROM part_compatibility WHERE partID = ?');
+    $stmt->execute([$partId]);
+    return array_column($stmt->fetchAll(), 'vehicleID');
+}
+
+/** Returns distinct vehicle makes ordered alphabetically. */
+function invGetMakes(PDO $db): array
+{
+    return $db->query('SELECT DISTINCT make FROM vehicle_model ORDER BY make')->fetchAll(PDO::FETCH_COLUMN);
+}
+
+/**
+ * Returns all models for a given make.
+ *
+ * @return array<array{vehicleID:int, model:string, chassisCode:string, yearRange:string|null}>
+ */
+function invGetModelsByMake(PDO $db, string $make): array
+{
+    $stmt = $db->prepare(
+        'SELECT vehicleID, model, chassisCode, yearRange
+         FROM vehicle_model
+         WHERE make = ?
+         ORDER BY model, chassisCode'
+    );
+    $stmt->execute([$make]);
+    return $stmt->fetchAll();
+}
+
 function invUpdatePart(PDO $db, int $partId, array $data, ?string $imageFilename): void
 {
     $sql = 'UPDATE spare_part SET categoryID = ?, brandID = ?, countryID = ?, partName = ?, partNumber = ?,

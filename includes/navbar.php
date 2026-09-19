@@ -43,6 +43,7 @@ if (isLoggedIn() && function_exists('cartItemCount')) {
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/catalogue/products.php">Shop</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/catalogue/categories.php">Categories</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/catalogue/search.php">Search</a></li>
                 <?php if (isLoggedIn()): ?>
                 <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/orders/my_orders.php">My Orders</a></li>

@@ -14,12 +14,71 @@ require_once __DIR__ . '/config/config.php';
  */
 
 $pageTitle = 'Home';
-$pageJs = ['home.js'];
+$pageJs = ['home.js', 'vehicle_filter.js'];
 // No separate stylesheet - index.php is part of the frozen skeleton, so
 // its styling lives in base.css alongside the rest of the shared chrome.
 
 $categories = [];
 $featuredParts = [];
+$newParts = [];
+$vehicleMakesByRegion = [];
+
+$popularVehicles = [
+    [
+        'name' => 'Toyota Aqua',
+        'make' => 'Toyota',
+        'model' => 'Aqua',
+        'chassis' => 'NHP10',
+        'badge' => 'Hybrid',
+        'desc' => '1.5L Petrol Hybrid (2011–2021)',
+        'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M4 14h16M6 14l2-6h8l2 6M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>',
+    ],
+    [
+        'name' => 'Toyota Prius',
+        'make' => 'Toyota',
+        'model' => 'Prius',
+        'chassis' => 'ZVW30 / ZVW50',
+        'badge' => 'Eco',
+        'desc' => '1.8L Hybrid Liftback (2009–2022)',
+        'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M3 14h18M5 14l2-6h10l2 6M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>',
+    ],
+    [
+        'name' => 'Suzuki Wagon R',
+        'make' => 'Suzuki',
+        'model' => 'Wagon R',
+        'chassis' => 'MH34S / MH44S / MH55S',
+        'badge' => 'Kei Car',
+        'desc' => '660cc Hybrid / FX / FZ / Stingray',
+        'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M4 15h16M5 15V8a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v7M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>',
+    ],
+    [
+        'name' => 'Honda Fit',
+        'make' => 'Honda',
+        'model' => 'Fit',
+        'chassis' => 'GP5 / GK3',
+        'badge' => 'Sport Hybrid',
+        'desc' => '1.5L i-DCD / 1.3L Petrol',
+        'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M3 14h18M5 14l2-6h10l2 6M6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>',
+    ],
+    [
+        'name' => 'Toyota Hiace',
+        'make' => 'Toyota',
+        'model' => 'Hiace',
+        'chassis' => 'KDH200 / GDH200',
+        'badge' => 'Van / Bus',
+        'desc' => '2.5L / 2.8L Diesel Commuter & GL',
+        'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M3 15h18V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6zM6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM7 9v3m5-3v3m5-3v3"/></svg>',
+    ],
+    [
+        'name' => 'Suzuki Every',
+        'make' => 'Suzuki',
+        'model' => 'Every',
+        'chassis' => 'DA64V / DA17V',
+        'badge' => 'Micro Van',
+        'desc' => '660cc Join / PC / PA Turbo',
+        'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M3 15h18V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v7zM6 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>',
+    ],
+];
 
 try {
     $db = getDB();
@@ -35,14 +94,43 @@ try {
          LIMIT 8'
     )->fetchAll();
 
+    // Featured Products (Selected Listings - matching Screenshot 4)
     $featuredParts = $db->query(
-        'SELECT partID, partName, price, imageURL, stockQty FROM spare_part WHERE isActive = 1 ORDER BY createdAt DESC LIMIT 8'
+        "SELECT sp.partID, sp.partName, sp.price, sp.imageURL, sp.stockQty, COALESCE(c.categoryName, 'SPARE PART') AS categoryName
+         FROM spare_part sp
+         LEFT JOIN category c ON c.categoryID = sp.categoryID
+         WHERE sp.isActive = 1
+         ORDER BY (sp.partName LIKE '%Audi S8%' OR sp.partName LIKE '%Citroen%' OR sp.partName LIKE '%BMW M2%' OR sp.partName LIKE '%Mercedes%' OR sp.partName LIKE '%Peugeot%') DESC, sp.price DESC
+         LIMIT 8"
     )->fetchAll();
+
+    // Newly Listed Parts (Fresh Inventory - matching Screenshot 5)
+    $newParts = $db->query(
+        "SELECT sp.partID, sp.partName, sp.price, sp.imageURL, sp.stockQty, COALESCE(c.categoryName, 'SPARE PART') AS categoryName
+         FROM spare_part sp
+         LEFT JOIN category c ON c.categoryID = sp.categoryID
+         WHERE sp.isActive = 1
+         ORDER BY (sp.partName LIKE '%Aqua%' OR sp.partName LIKE '%Axio%' OR sp.partName LIKE '%Allion%') DESC, sp.createdAt DESC, sp.partID DESC
+         LIMIT 8"
+    )->fetchAll();
+
+    // Grouped Vehicle Makes by Region
+    $stmt = $db->query("SELECT region, make FROM vehicle_model GROUP BY region, make ORDER BY FIELD(region, 'Japanese Vehicles', 'European Vehicles', 'American Vehicles', 'Chinese Vehicles', 'Indian Vehicles', 'Korean Vehicles'), region ASC, make ASC");
+    $rawMakes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($rawMakes as $row) {
+        $reg = $row['region'] ?: 'Other Vehicles';
+        if (!isset($vehicleMakesByRegion[$reg])) {
+            $vehicleMakesByRegion[$reg] = [];
+        }
+        $vehicleMakesByRegion[$reg][] = $row['make'];
+    }
 } catch (PDOException $e) {
     // Catalogue tables may not exist yet in a partial build - the page
     // still renders with empty sections rather than a fatal error.
     $categories = [];
     $featuredParts = [];
+    $newParts = [];
+    $vehicleMakesByRegion = [];
 }
 
 /**
@@ -99,39 +187,121 @@ require __DIR__ . '/includes/header.php';
 ?>
 
 <noscript>
-<style>.js-reveal .home-section-head, .js-reveal .home-category-tile, .js-reveal .home-why-item, .js-reveal .home-part-card { opacity: 1 !important; transform: none !important; }</style>
+<style>.js-reveal .home-section-head, .js-reveal .home-category-tile, .js-reveal .home-why-item, .js-reveal .home-part-card, .js-reveal .home-product-card, .js-reveal .home-fitment-card { opacity: 1 !important; transform: none !important; }</style>
 </noscript>
 
 <section class="home-hero">
-    <div class="container home-hero-inner">
-        <div class="home-hero-content">
-            <span class="home-hero-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
-                Trusted by hundreds of vehicle owners across Sri Lanka
-            </span>
-            <h1>Find the right spare part, fast.</h1>
-            <p class="text-muted">Search by part name, brand, size or your target price.</p>
-            <form class="home-hero-search" action="<?php echo BASE_URL; ?>/catalogue/search.php" method="get">
-                <input
-                    type="text"
-                    name="keyword"
-                    class="form-control"
-                    placeholder="Search by part name, part number or description..."
-                >
-                <button type="submit" class="btn btn-accent">Search</button>
+    <div class="container text-center home-hero-intro">
+        <h1 class="home-hero-main-title">Find the Right Part. Get Back on the Road.</h1>
+        <p class="home-hero-main-subtitle">Search thousands of genuine, OEM and aftermarket parts from our trusted inventory across Sri Lanka.</p>
+    </div>
+
+    <div class="container">
+        <div class="home-hero-card">
+            <div class="home-hero-card-head">
+                <h2 class="home-hero-card-title">FIND THE RIGHT PART <span class="home-hero-card-fast">FAST</span></h2>
+                <p class="home-hero-card-subtitle">Search by Make, Model, Chassis Code or Part Name</p>
+            </div>
+
+            <form class="home-hero-vehicle-form" action="<?php echo BASE_URL; ?>/catalogue/search.php" method="get" data-vehicle-widget data-base-url="<?php echo e(BASE_URL); ?>">
+                <div class="home-hero-bar">
+                    <div class="home-hero-col home-hero-col-select">
+                        <select id="homeMakeSelect" name="make" class="home-hero-select" data-selected="">
+                            <option value="">Any Make</option>
+                            <?php foreach ($vehicleMakesByRegion as $reg => $makes): ?>
+                            <optgroup label="<?php echo e($reg); ?>">
+                                <?php foreach ($makes as $vm): ?>
+                                <option value="<?php echo e($vm); ?>"><?php echo e($vm); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="home-hero-col home-hero-col-select">
+                        <select id="homeModelSelect" name="model" class="home-hero-select" data-selected="" disabled>
+                            <option value="">Any Model</option>
+                        </select>
+                    </div>
+
+                    <div class="home-hero-col home-hero-col-select">
+                        <select id="homeChassisSelect" name="chassis" class="home-hero-select" data-selected="" disabled>
+                            <option value="">Any Chassis Code</option>
+                        </select>
+                    </div>
+
+                    <div class="home-hero-col home-hero-col-input">
+                        <span class="home-hero-input-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                        </span>
+                        <input type="text" name="keyword" class="home-hero-input" placeholder="Part Name...">
+                    </div>
+
+                    <button type="submit" class="home-hero-submit-btn">SEARCH</button>
+                </div>
             </form>
-        </div>
-        <div class="home-hero-art">
-            <div class="home-hero-photo-frame">
-                <img
-                    src="<?php echo BASE_URL; ?>/assets/images/hero-banner.jpg?v=<?php echo (int) @filemtime(__DIR__ . '/assets/images/hero-banner.jpg'); ?>"
-                    alt="Spare parts and tools organised on a workshop wall"
-                    class="home-hero-photo"
-                >
-                <span class="home-hero-photo-badge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
-                    Genuine Parts
+
+            <div class="home-hero-pills">
+                <span class="home-hero-pill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    100% Secure Shopping
                 </span>
+                <span class="home-hero-pill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="m9 12 2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
+                    Quality Parts Guaranteed
+                </span>
+                <span class="home-hero-pill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                    Fast Delivery Islandwide
+                </span>
+                <span class="home-hero-pill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Dedicated Support
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="home-features-bar">
+    <div class="container home-features-grid">
+        <div class="home-feature-box">
+            <span class="home-feature-icon home-feature-icon--cyan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </span>
+            <div class="home-feature-info">
+                <h4 class="home-feature-title">1,000+ Parts</h4>
+                <p class="home-feature-desc">Across our verified inventory</p>
+            </div>
+        </div>
+
+        <div class="home-feature-box">
+            <span class="home-feature-icon home-feature-icon--blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+            <div class="home-feature-info">
+                <h4 class="home-feature-title">Quality Guaranteed</h4>
+                <p class="home-feature-desc">100% Genuine & OEM options</p>
+            </div>
+        </div>
+
+        <div class="home-feature-box">
+            <span class="home-feature-icon home-feature-icon--orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+            </span>
+            <div class="home-feature-info">
+                <h4 class="home-feature-title">Islandwide Delivery</h4>
+                <p class="home-feature-desc">Fast courier across Sri Lanka</p>
+            </div>
+        </div>
+
+        <div class="home-feature-box">
+            <span class="home-feature-icon home-feature-icon--teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            </span>
+            <div class="home-feature-info">
+                <h4 class="home-feature-title">Direct Support</h4>
+                <p class="home-feature-desc">Call or WhatsApp our team</p>
             </div>
         </div>
     </div>
@@ -140,7 +310,12 @@ require __DIR__ . '/includes/header.php';
 <div class="container">
     <section class="home-section js-reveal">
         <div class="home-section-head">
-            <h2>Browse by Category</h2>
+            <div>
+                <span class="home-section-eyebrow">QUICK DISCOVERY</span>
+                <h2>Shop by Category</h2>
+                <p class="text-muted">Explore the most popular automotive part families.</p>
+            </div>
+            <a class="home-section-more" href="<?php echo BASE_URL; ?>/catalogue/categories.php">View all categories &rarr;</a>
         </div>
         <?php if (empty($categories)): ?>
         <p class="text-muted">Categories will appear here once the catalogue is populated.</p>
@@ -158,6 +333,135 @@ require __DIR__ . '/includes/header.php';
     </section>
 </div>
 
+<!-- ===================================================================== -->
+<!-- FEATURED PRODUCTS (Selected Listings - Matching Screenshot 4)        -->
+<!-- ===================================================================== -->
+<section class="home-section home-featured-section js-reveal">
+    <div class="container">
+        <div class="home-section-head">
+            <div>
+                <span class="home-section-eyebrow">SELECTED LISTINGS</span>
+                <h2>Featured Products</h2>
+                <p class="text-muted">Hand-picked performance and OEM replacement components in high demand.</p>
+            </div>
+            <a class="home-section-more" href="<?php echo BASE_URL; ?>/catalogue/products.php">View All Products &rarr;</a>
+        </div>
+        <?php if (empty($featuredParts)): ?>
+        <p class="text-muted">Featured parts will appear here once the catalogue is populated.</p>
+        <?php else: ?>
+        <div class="home-product-grid">
+            <?php foreach ($featuredParts as $index => $part): ?>
+            <div class="home-product-card" style="transition-delay: <?php echo $index * 0.05; ?>s">
+                <div class="home-product-thumb">
+                    <span class="home-product-pill home-product-pill--featured">Featured</span>
+                    <a href="<?php echo BASE_URL; ?>/catalogue/product_details.php?id=<?php echo (int) $part['partID']; ?>">
+                        <?php echo partImage($part, 'md'); ?>
+                    </a>
+                </div>
+                <div class="home-product-body">
+                    <div class="home-product-category"><?php echo strtoupper(e($part['categoryName'])); ?></div>
+                    <h3 class="home-product-title">
+                        <a href="<?php echo BASE_URL; ?>/catalogue/product_details.php?id=<?php echo (int) $part['partID']; ?>"><?php echo e($part['partName']); ?></a>
+                    </h3>
+                    <div class="home-product-footer">
+                        <span class="home-product-price"><?php echo formatMoney((float) $part['price']); ?></span>
+                        <?php if ((int) $part['stockQty'] > 0): ?>
+                        <span class="home-product-stock home-product-stock--in">
+                            <span class="home-product-stock-dot"></span> In stock
+                        </span>
+                        <?php else: ?>
+                        <span class="home-product-stock home-product-stock--out">Out of stock</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- NEWLY LISTED PARTS (Fresh Inventory - Matching Screenshot 5)         -->
+<!-- ===================================================================== -->
+<section class="home-section home-new-parts-section js-reveal">
+    <div class="container">
+        <div class="home-section-head">
+            <div>
+                <span class="home-section-eyebrow">FRESH INVENTORY</span>
+                <h2>Newly Listed Parts</h2>
+                <p class="text-muted">Freshly arrived stock and recent additions directly from verified distributors.</p>
+            </div>
+            <a class="home-section-more" href="<?php echo BASE_URL; ?>/catalogue/products.php?sort=newest">View All New Arrivals &rarr;</a>
+        </div>
+        <?php if (empty($newParts)): ?>
+        <p class="text-muted">New arrivals will appear here once the catalogue is populated.</p>
+        <?php else: ?>
+        <div class="home-product-grid">
+            <?php foreach ($newParts as $index => $part): ?>
+            <div class="home-product-card" style="transition-delay: <?php echo $index * 0.05; ?>s">
+                <div class="home-product-thumb">
+                    <span class="home-product-pill home-product-pill--new">New</span>
+                    <a href="<?php echo BASE_URL; ?>/catalogue/product_details.php?id=<?php echo (int) $part['partID']; ?>">
+                        <?php echo partImage($part, 'md'); ?>
+                    </a>
+                </div>
+                <div class="home-product-body">
+                    <div class="home-product-category"><?php echo strtoupper(e($part['categoryName'])); ?></div>
+                    <h3 class="home-product-title">
+                        <a href="<?php echo BASE_URL; ?>/catalogue/product_details.php?id=<?php echo (int) $part['partID']; ?>"><?php echo e($part['partName']); ?></a>
+                    </h3>
+                    <div class="home-product-footer">
+                        <span class="home-product-price"><?php echo formatMoney((float) $part['price']); ?></span>
+                        <?php if ((int) $part['stockQty'] > 0): ?>
+                        <span class="home-product-stock home-product-stock--in">
+                            <span class="home-product-stock-dot"></span> In stock
+                        </span>
+                        <?php else: ?>
+                        <span class="home-product-stock home-product-stock--out">Out of stock</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- BROWSE BY VEHICLE (Popular Fitments - Matching Screenshot 5)          -->
+<!-- ===================================================================== -->
+<section class="home-section home-fitment-section js-reveal">
+    <div class="container">
+        <div class="home-section-head">
+            <div>
+                <span class="home-section-eyebrow">POPULAR FITMENTS</span>
+                <h2>Browse by Vehicle</h2>
+                <p class="text-muted">Find precision-fit spare parts specifically matched to Sri Lanka's most popular daily drivers.</p>
+            </div>
+            <a class="home-section-more" href="<?php echo BASE_URL; ?>/catalogue/search.php">Search All Models &rarr;</a>
+        </div>
+        <div class="home-fitment-grid">
+            <?php foreach ($popularVehicles as $i => $veh): ?>
+            <a class="home-fitment-card" style="transition-delay: <?php echo $i * 0.06; ?>s" href="<?php echo BASE_URL; ?>/catalogue/search.php?make=<?php echo urlencode($veh['make']); ?>&model=<?php echo urlencode($veh['model']); ?>">
+                <div class="home-fitment-head">
+                    <span class="home-fitment-icon"><?php echo $veh['icon']; ?></span>
+                    <span class="home-fitment-badge"><?php echo e($veh['badge']); ?></span>
+                </div>
+                <h3 class="home-fitment-name"><?php echo e($veh['name']); ?></h3>
+                <div class="home-fitment-chassis">Chassis: <strong><?php echo e($veh['chassis']); ?></strong></div>
+                <div class="home-fitment-desc"><?php echo e($veh['desc']); ?></div>
+                <div class="home-fitment-action">
+                    <span>Find Parts</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
 <section class="home-why js-reveal">
     <div class="container">
         <div class="home-section-head">
@@ -172,44 +476,6 @@ require __DIR__ . '/includes/header.php';
             </div>
             <?php endforeach; ?>
         </div>
-    </div>
-</section>
-
-<section class="home-featured js-reveal">
-    <div class="container">
-        <div class="home-section-head">
-            <h2>Featured Parts</h2>
-            <a href="<?php echo BASE_URL; ?>/catalogue/products.php">View All &rarr;</a>
-        </div>
-        <?php if (empty($featuredParts)): ?>
-        <p class="text-muted">Featured parts will appear here once the catalogue is populated.</p>
-        <?php else: ?>
-        <div class="home-part-grid">
-            <?php foreach ($featuredParts as $index => $part): ?>
-            <div class="home-part-card" style="transition-delay: <?php echo $index * 0.06; ?>s">
-                <?php if ($index < 3): ?>
-                <span class="home-part-badge">New</span>
-                <?php endif; ?>
-                <a class="home-part-card-link" href="<?php echo BASE_URL; ?>/catalogue/product_details.php?id=<?php echo (int) $part['partID']; ?>">
-                    <?php echo partImage($part, 'md'); ?>
-                    <p class="home-part-name"><?php echo e($part['partName']); ?></p>
-                    <p class="home-part-price"><?php echo formatMoney((float) $part['price']); ?></p>
-                </a>
-                <?php if ((int) $part['stockQty'] > 0): ?>
-                <form class="home-part-quickadd" method="post" action="<?php echo BASE_URL; ?>/orders/cart_action.php">
-                    <?php echo csrfField(); ?>
-                    <input type="hidden" name="action" value="add">
-                    <input type="hidden" name="part_id" value="<?php echo (int) $part['partID']; ?>">
-                    <input type="hidden" name="quantity" value="1">
-                    <button type="submit" class="btn btn-sm btn-primary btn-block">Add to Cart</button>
-                </form>
-                <?php else: ?>
-                <p class="home-part-quickadd home-part-outofstock">Out of Stock</p>
-                <?php endif; ?>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
     </div>
 </section>
 

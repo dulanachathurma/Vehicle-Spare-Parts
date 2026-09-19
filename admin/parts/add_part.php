@@ -24,6 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $imageFilename = invHandleImageUpload($_FILES['image'] ?? []);
             $partId = invCreatePart($db, $_POST, $imageFilename, currentAdminId());
+            // Save vehicle compatibility rows
+            $vehicleIds = array_filter(array_map('intval', (array) ($_POST['vehicle_ids'] ?? [])));
+            invSaveCompatibility($db, $partId, $vehicleIds);
             setFlash('success', 'Part created.');
             redirect('admin/parts/list_parts.php');
         } catch (RuntimeException $e) {
@@ -37,6 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $categoryTree = invCategoryTree($db);
 $brands = $db->query('SELECT brandID, brandName FROM brand ORDER BY brandName')->fetchAll();
 $countries = $db->query('SELECT countryID, countryName FROM country ORDER BY countryName')->fetchAll();
+$makes = invGetMakes($db);
+$oldVehicleIds = array_map('intval', (array) ($old['vehicle_ids'] ?? []));
 
 $pageTitle = 'Add Part';
 $pageCss = ['admin.css'];
@@ -135,6 +140,34 @@ require __DIR__ . '/../../includes/header.php';
                         <?php if (isset($errors['image'])): ?><p class="form-error"><?php echo e($errors['image']); ?></p><?php endif; ?>
                     </div>
 
+                    <!-- Vehicle Compatibility -->
+                    <div class="form-group compat-section">
+                        <label class="form-label">Vehicle Compatibility <span style="font-weight:400;font-size:.85em;color:var(--text-muted)">(optional — select all models this part fits)</span></label>
+
+                        <div class="compat-picker">
+                            <div class="compat-make-col">
+                                <label class="compat-sublabel" for="compat_make">1. Choose Make</label>
+                                <select id="compat_make" class="form-control">
+                                    <option value="">— Select Make —</option>
+                                    <?php foreach ($makes as $mk): ?>
+                                    <option value="<?php echo e($mk); ?>"><?php echo e($mk); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="compat-model-col">
+                                <label class="compat-sublabel">2. Tick Compatible Models</label>
+                                <div id="compat_models_list" class="compat-models-list">
+                                    <p class="compat-placeholder">Select a make first.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="compat_selected_tags" class="compat-tags"></div>
+                    </div>
+                    <!-- hidden inputs written by JS -->
+                    <div id="compat_hidden_inputs"></div>
+
                     <button type="submit" class="btn btn-primary">Create Part</button>
                     <a class="btn btn-outline" href="<?php echo BASE_URL; ?>/admin/parts/list_parts.php">Cancel</a>
                 </form>
@@ -142,5 +175,67 @@ require __DIR__ . '/../../includes/header.php';
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    const makeSelect  = document.getElementById('compat_make');
+    const modelsList  = document.getElementById('compat_models_list');
+    const tagsBox     = document.getElementById('compat_selected_tags');
+    const hiddenBox   = document.getElementById('compat_hidden_inputs');
+    const preselected = <?php echo json_encode($oldVehicleIds); ?>;
+
+    // Sync hidden inputs & tag pills from checked checkboxes
+    function syncSelection() {
+        const checked = modelsList.querySelectorAll('input[type=checkbox]:checked');
+        hiddenBox.innerHTML = '';
+        tagsBox.innerHTML   = '';
+        checked.forEach(cb => {
+            const inp = document.createElement('input');
+            inp.type  = 'hidden';
+            inp.name  = 'vehicle_ids[]';
+            inp.value = cb.value;
+            hiddenBox.appendChild(inp);
+
+            const tag = document.createElement('span');
+            tag.className   = 'compat-tag';
+            tag.textContent = cb.dataset.label;
+            tagsBox.appendChild(tag);
+        });
+    }
+
+    makeSelect.addEventListener('change', function () {
+        const make = this.value;
+        if (!make) { modelsList.innerHTML = '<p class="compat-placeholder">Select a make first.</p>'; return; }
+
+        modelsList.innerHTML = '<p class="compat-placeholder">Loading…</p>';
+
+        fetch(`<?php echo BASE_URL; ?>/admin/parts/ajax_models.php?make=${encodeURIComponent(make)}`)
+            .then(r => r.json())
+            .then(models => {
+                if (!models.length) {
+                    modelsList.innerHTML = '<p class="compat-placeholder">No models found for this make.</p>';
+                    return;
+                }
+                modelsList.innerHTML = '';
+                models.forEach(m => {
+                    const label = document.createElement('label');
+                    label.className = 'compat-model-row';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.value = m.vehicleID;
+                    const txt = `${m.model} <span class="compat-chassis">${m.chassisCode}${m.yearRange ? ' · '+m.yearRange : ''}</span>`;
+                    cb.dataset.label = `${make} ${m.model} (${m.chassisCode})`;
+                    if (preselected.includes(Number(m.vehicleID))) cb.checked = true;
+                    cb.addEventListener('change', syncSelection);
+                    label.appendChild(cb);
+                    label.insertAdjacentHTML('beforeend', ' ' + txt);
+                    modelsList.appendChild(label);
+                });
+                syncSelection();
+            })
+            .catch(() => { modelsList.innerHTML = '<p class="compat-placeholder" style="color:var(--danger)">Failed to load models.</p>'; });
+    });
+}());
+</script>
 
 <?php require __DIR__ . '/../../includes/footer.php'; ?>

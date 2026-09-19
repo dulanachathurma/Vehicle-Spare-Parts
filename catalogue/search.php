@@ -14,6 +14,9 @@ $brandIds = array_map('intval', $_GET['brand'] ?? []);
 $countryIds = array_map('intval', $_GET['country'] ?? []);
 $size = trim((string) ($_GET['size'] ?? ''));
 $priceTarget = isset($_GET['price']) && $_GET['price'] !== '' ? (float) $_GET['price'] : null;
+$make = trim((string) ($_GET['make'] ?? ''));
+$model = trim((string) ($_GET['model'] ?? ''));
+$chassis = trim((string) ($_GET['chassis'] ?? ''));
 $sort = in_array($_GET['sort'] ?? '', CAT_SORT_OPTIONS, true) ? $_GET['sort'] : 'relevance';
 $page = max(1, (int) ($_GET['page'] ?? 1));
 
@@ -23,6 +26,9 @@ $filters = [
     'countryIds' => $countryIds,
     'size' => $size,
     'priceTarget' => $priceTarget,
+    'make' => $make,
+    'model' => $model,
+    'chassis' => $chassis,
     'sort' => $sort,
     'page' => $page,
 ];
@@ -38,13 +44,14 @@ catLogSearch(array_merge($filters, ['categoryIds' => $categoryId ? [$categoryId]
 $categoryTree = catCategoryTree($db);
 $brands = $db->query('SELECT brandID, brandName FROM brand ORDER BY brandName')->fetchAll();
 $countries = $db->query('SELECT countryID, countryName FROM country ORDER BY countryName')->fetchAll();
+$vehicleMakes = catVehicleMakes($db);
 
 $brandCounts = catFacetCounts($db, $filters, 'brandIds');
 $countryCounts = catFacetCounts($db, $filters, 'countryIds');
 
 $pageTitle = 'Search Results';
 $pageCss = ['catalogue.css'];
-$pageJs = ['catalogue.js'];
+$pageJs = ['catalogue.js', 'vehicle_filter.js'];
 require __DIR__ . '/../includes/header.php';
 ?>
 
@@ -67,6 +74,29 @@ require __DIR__ . '/../includes/header.php';
                 <div class="form-group">
                     <label class="form-label" for="size">Size</label>
                     <input type="text" id="size" name="size" class="form-control" value="<?php echo e($size); ?>" placeholder="e.g. 205/55">
+                </div>
+
+                <div class="form-group cat-vehicle-filter-group" data-vehicle-widget>
+                    <label class="form-label">Vehicle Compatibility</label>
+                    <select id="vehicleMakeSelect" name="make" class="form-control mb-1" data-selected="<?php echo e($make); ?>">
+                        <option value="">Any Make</option>
+                        <?php foreach ($vehicleMakes as $regionName => $makesList): ?>
+                        <optgroup label="<?php echo e($regionName); ?>">
+                            <?php foreach ($makesList as $vm): ?>
+                            <option value="<?php echo e($vm); ?>" <?php echo $make === $vm ? 'selected' : ''; ?>><?php echo e($vm); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <select id="vehicleModelSelect" name="model" class="form-control mb-1" data-selected="<?php echo e($model); ?>">
+                        <option value="">Any Model</option>
+                    </select>
+
+                    <select id="vehicleChassisSelect" name="chassis" class="form-control" data-selected="<?php echo e($chassis); ?>">
+                        <option value="">Any Chassis Code</option>
+                    </select>
+                    <p class="form-hint">Filter parts compatible with your vehicle model.</p>
                 </div>
 
                 <div class="form-group">
@@ -132,6 +162,9 @@ require __DIR__ . '/../includes/header.php';
             <div class="cat-chip-row">
                 <?php if ($keyword !== ''): ?>
                 <a class="cat-chip is-removable" href="<?php echo e(catRemoveFilterUrl($_GET, 'keyword')); ?>">Keyword: <?php echo e($keyword); ?> &times;</a>
+                <?php endif; ?>
+                <?php if ($make !== ''): ?>
+                <a class="cat-chip is-removable" href="<?php echo e(catRemoveVehicleFilterUrl($_GET)); ?>">Vehicle: <?php echo e($make); ?><?php echo $model !== '' ? ' &middot; ' . e($model) : ''; ?><?php echo $chassis !== '' ? ' (' . e($chassis) . ')' : ''; ?> &times;</a>
                 <?php endif; ?>
                 <?php if ($categoryId): ?>
                 <a class="cat-chip is-removable" href="<?php echo e(catRemoveFilterUrl($_GET, 'category')); ?>">Category &times;</a>

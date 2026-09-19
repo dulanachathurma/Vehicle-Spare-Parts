@@ -249,3 +249,180 @@
 .cat-qty-group {
     max-width: 140px;
 }
+
+/* Vehicle compatibility tags in product details */
+.cat-detail-vehicles {
+    background: #f8fafc;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+}
+
+.cat-detail-section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.85rem;
+    display: flex;
+    align-items: center;
+}
+
+.cat-vehicle-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.cat-vehicle-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.84rem;
+    color: #334155;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.cat-vehicle-tag strong {
+    color: var(--color-primary-dark);
+}
+
+.cat-vehicle-code {
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.cat-vehicle-years {
+    color: #64748b;
+    font-size: 0.78rem;
+}
+
+/* Detail action buttons */
+.cat-detail-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.cat-detail-cart-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.cat-whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #15803d;
+    font-weight: 600;
+    padding: 0.6rem 1.1rem;
+    transition: all 0.2s ease;
+}
+
+.cat-whatsapp-btn:hover {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #ffffff;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+}
+
+/* Category Search Selector Card (Screenshot 4) */
+.cat-selector-card {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    box-shadow: var(--shadow-md);
+    margin: 2rem auto 1rem;
+    max-width: 960px;
+}
+
+.cat-selector-head h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 0.35rem;
+    color: var(--color-text);
+}
+
+.cat-selector-head p {
+    margin: 0 0 1.5rem;
+    font-size: 0.95rem;
+}
+
+.cat-selector-row {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.cat-selector-col {
+    flex: 1 1 280px;
+}
+
+.cat-selector-btn-col {
+    flex: 0 0 auto;
+}
+
+.cat-selector-submit {
+    height: 44px;
+    padding: 0 1.75rem;
+    font-weight: 700;
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.cat-selector-submit:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .cat-detail-vehicles {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .cat-vehicle-tag {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .cat-vehicle-tag strong {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .cat-vehicle-code {
+    background: #1e3a8a;
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .cat-whatsapp-btn {
+    background: #064e3b;
+    border-color: #059669;
+    color: #6ee7b7;
+}
+
+[data-theme="dark"] .cat-whatsapp-btn:hover {
+    background: #10b981;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .cat-selector-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
