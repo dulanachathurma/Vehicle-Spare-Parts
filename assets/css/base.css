@@ -102,9 +102,19 @@
 [data-theme="dark"] td,
 [data-theme="dark"] th,
 [data-theme="dark"] li,
-[data-theme="dark"] span,
 [data-theme="dark"] label {
     color: var(--color-text);
+}
+
+/* span gets its own rule at lower specificity so badge-status can override it */
+[data-theme="dark"] span:not(.badge-status):not(.nav-cart-badge) {
+    color: var(--color-text);
+}
+
+/* Part thumbnail placeholder — dark-friendly background */
+[data-theme="dark"] .part-thumb {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: #64748b;
 }
 
 /* Inputs and selects */
