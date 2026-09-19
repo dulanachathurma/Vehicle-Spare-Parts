@@ -14,16 +14,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !verifyCsrf($_POST['csrf_token'] ??
 
 $db = getDB();
 $userId = currentUserId();
+$recipientName = trim($_POST['recipient_name'] ?? '');
+$recipientPhone = trim($_POST['recipient_phone'] ?? '');
 $shippingAddress = trim($_POST['shipping_address'] ?? '');
 $gatewayId = (int) ($_POST['gateway_id'] ?? 0);
 
-if ($shippingAddress === '' || $gatewayId <= 0) {
-    setFlash('error', 'Please provide a shipping address and choose a payment method.');
+if ($recipientName === '' || $recipientPhone === '' || $shippingAddress === '' || $gatewayId <= 0) {
+    setFlash('error', 'Please provide your name, phone number, shipping address and a payment method.');
     redirect('orders/checkout.php');
 }
 
 try {
-    $result = placeOrder($db, $userId, $shippingAddress, $gatewayId);
+    $result = placeOrder($db, $userId, $recipientName, $recipientPhone, $shippingAddress, $gatewayId);
     redirect('payment/pay.php?order=' . $result['orderId']);
 } catch (Throwable $e) {
     setFlash('error', 'We could not place your order: ' . $e->getMessage());

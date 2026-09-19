@@ -111,6 +111,7 @@ require __DIR__ . '/../../includes/header.php';
                     </tbody>
                 </table>
                 <p><strong>Total: <?php echo formatMoney((float) $viewOrder['finalAmount']); ?></strong></p>
+                <p>Recipient: <?php echo e($viewOrder['recipientName'] ?? ''); ?> &middot; <?php echo e($viewOrder['recipientPhone'] ?? ''); ?></p>
                 <p>Shipping Address: <?php echo e($viewOrder['shippingAddress']); ?></p>
 
                 <?php if ($viewPayment): ?>

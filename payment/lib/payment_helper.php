@@ -44,10 +44,15 @@ function payhereVerifyNotifyHash(array $data): bool
 }
 
 /**
- * Marks a Pending payment Success and, the first time this runs for an
- * order, confirms the order too. The "status = 'Pending'" guards make
- * this idempotent, so it's safe to call from both payment_return.php
- * and payhere_notify.php without double-processing.
+ * Marks a Pending (or previously Failed) payment Success and, the first
+ * time this runs for an order, confirms the order too. Allowing a retry
+ * from Failed - not just Pending - matters because a customer whose
+ * card was declined, or who cancelled out of the payment page, must be
+ * able to try again from My Orders; without it they'd be stuck with an
+ * order that's neither paid nor payable. The "status IN (...)" guards
+ * still make this idempotent against an already-Success payment, so
+ * it's safe to call from both payment_return.php and payhere_notify.php
+ * without double-processing.
  */
 function markPaymentSuccess(PDO $db, int $orderId, ?string $transactionId): void
 {
@@ -55,7 +60,7 @@ function markPaymentSuccess(PDO $db, int $orderId, ?string $transactionId): void
 
     try {
         $stmt = $db->prepare(
-            "UPDATE payment SET status = 'Success', transactionID = ?, paidAt = NOW() WHERE orderID = ? AND status = 'Pending'"
+            "UPDATE payment SET status = 'Success', transactionID = ?, paidAt = NOW() WHERE orderID = ? AND status IN ('Pending', 'Failed')"
         );
         $stmt->execute([$transactionId, $orderId]);
 
@@ -73,7 +78,7 @@ function markPaymentSuccess(PDO $db, int $orderId, ?string $transactionId): void
 
 function markPaymentFailed(PDO $db, int $orderId): void
 {
-    $stmt = $db->prepare("UPDATE payment SET status = 'Failed' WHERE orderID = ? AND status = 'Pending'");
+    $stmt = $db->prepare("UPDATE payment SET status = 'Failed' WHERE orderID = ? AND status IN ('Pending', 'Failed')");
     $stmt->execute([$orderId]);
 }
 

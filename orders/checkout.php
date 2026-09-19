@@ -27,6 +27,22 @@ if (!empty($stockProblems)) {
 $totals = calculateTotals(cartTotal($items));
 $gateways = $db->query('SELECT * FROM payment_gateway WHERE isActive = 1 ORDER BY gatewayName')->fetchAll();
 
+/** A small icon + subtitle per payment gateway, purely decorative. */
+function gatewayVisual(string $gatewayName): array
+{
+    if (stripos($gatewayName, 'payhere') !== false) {
+        return [
+            'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path><path d="M6 15h4"></path></svg>',
+            'sub' => 'Cards, eZ Cash, mobile banking and more',
+        ];
+    }
+
+    return [
+        'icon' => '<span class="ord-pay-method-cards"><span class="ord-mini-visa">VISA</span><span class="ord-mini-mc"><i></i><i></i></span></span>',
+        'sub' => 'Visa, Mastercard and other major cards',
+    ];
+}
+
 $pageTitle = 'Checkout';
 $pageCss = ['orders.css'];
 $pageJs = ['cart.js'];
@@ -41,9 +57,18 @@ require __DIR__ . '/../includes/header.php';
             <?php echo csrfField(); ?>
 
             <div class="card mb-2">
-                <h2 class="card-title">Shipping Address</h2>
+                <h2 class="card-title">Delivery Details</h2>
                 <div class="form-group">
-                    <textarea name="shipping_address" class="form-control" rows="3" required><?php echo e($user['address'] ?? ''); ?></textarea>
+                    <label class="form-label" for="recipient_name">Full Name</label>
+                    <input type="text" id="recipient_name" name="recipient_name" class="form-control" value="<?php echo e($user['username'] ?? ''); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="recipient_phone">Phone Number</label>
+                    <input type="tel" id="recipient_phone" name="recipient_phone" class="form-control" placeholder="07X XXX XXXX" value="<?php echo e($user['phone'] ?? ''); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="shipping_address">Shipping Address</label>
+                    <textarea id="shipping_address" name="shipping_address" class="form-control" rows="3" required><?php echo e($user['address'] ?? ''); ?></textarea>
                 </div>
             </div>
 
@@ -52,10 +77,17 @@ require __DIR__ . '/../includes/header.php';
                 <?php if (empty($gateways)): ?>
                 <p class="form-error">No payment methods are currently available. Please contact the shop.</p>
                 <?php endif; ?>
-                <?php foreach ($gateways as $i => $gateway): ?>
-                <label class="ord-gateway-option">
+                <?php foreach ($gateways as $i => $gateway): $visual = gatewayVisual($gateway['gatewayName']); ?>
+                <label class="ord-pay-method">
                     <input type="radio" name="gateway_id" value="<?php echo (int) $gateway['gatewayID']; ?>" <?php echo $i === 0 ? 'checked' : ''; ?> required>
-                    <?php echo e($gateway['gatewayName']); ?>
+                    <span class="ord-pay-method-icon"><?php echo $visual['icon']; ?></span>
+                    <span class="ord-pay-method-text">
+                        <span class="ord-pay-method-name"><?php echo e($gateway['gatewayName']); ?></span>
+                        <span class="ord-pay-method-sub"><?php echo e($visual['sub']); ?></span>
+                    </span>
+                    <span class="ord-pay-method-check">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+                    </span>
                 </label>
                 <?php endforeach; ?>
             </div>

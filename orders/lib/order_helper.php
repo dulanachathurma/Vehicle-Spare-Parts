@@ -120,7 +120,7 @@ function calculateTotals(float $subtotal): array
  *
  * @return array{orderId:int, finalAmount:float}
  */
-function placeOrder(PDO $db, int $userId, string $shippingAddress, int $gatewayId): array
+function placeOrder(PDO $db, int $userId, string $recipientName, string $recipientPhone, string $shippingAddress, int $gatewayId): array
 {
     $cart = getOrCreateCart($db, $userId);
     $items = cartItemsForCart($db, (int) $cart['cartID']);
@@ -139,11 +139,11 @@ function placeOrder(PDO $db, int $userId, string $shippingAddress, int $gatewayI
 
     try {
         $orderStmt = $db->prepare(
-            'INSERT INTO orders (userID, orderDate, totalAmount, discountAmount, taxAmount, finalAmount, status, shippingAddress)
-             VALUES (?, NOW(), ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO orders (userID, recipientName, recipientPhone, orderDate, totalAmount, discountAmount, taxAmount, finalAmount, status, shippingAddress)
+             VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)'
         );
         $orderStmt->execute([
-            $userId, $totals['subtotal'], $totals['discountAmount'], $totals['taxAmount'], $totals['finalAmount'], 'Pending', $shippingAddress,
+            $userId, $recipientName, $recipientPhone, $totals['subtotal'], $totals['discountAmount'], $totals['taxAmount'], $totals['finalAmount'], 'Pending', $shippingAddress,
         ]);
         $orderId = (int) $db->lastInsertId();
 
