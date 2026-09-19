@@ -77,12 +77,53 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Simulated card form (payment/mock_gateway.php) - restrict each
     // field to what a real card form would accept, formatting as the
-    // customer types rather than only rejecting on submit.
+    // customer types rather than only rejecting on submit. Also mirrors
+    // what's typed onto a live card preview above the form, and detects
+    // the card network (Visa/Mastercard) from the leading digits, the
+    // way a real checkout page would.
+    var previewNumber = document.querySelector('[data-preview-number]');
+    var previewName = document.querySelector('[data-preview-name]');
+    var previewExpiry = document.querySelector('[data-preview-expiry]');
+    var brandVisa = document.querySelector('[data-brand-visa]');
+    var brandMastercard = document.querySelector('[data-brand-mastercard]');
+
+    function detectCardBrand(digits) {
+        if (/^4/.test(digits)) {
+            return 'visa';
+        }
+        if (/^5[1-5]/.test(digits) || /^2[2-7]/.test(digits)) {
+            return 'mastercard';
+        }
+        return null;
+    }
+
+    var cardHolderInput = document.getElementById('card_holder');
+    if (cardHolderInput && previewName) {
+        cardHolderInput.addEventListener('input', function () {
+            previewName.textContent = cardHolderInput.value.trim() || 'YOUR NAME';
+        });
+    }
+
     var cardNumberInput = document.getElementById('card_number');
     if (cardNumberInput) {
         cardNumberInput.addEventListener('input', function () {
             var digits = cardNumberInput.value.replace(/\D/g, '').slice(0, 16);
             cardNumberInput.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+            if (previewNumber) {
+                var groups = [];
+                for (var i = 0; i < 16; i += 4) {
+                    var group = digits.slice(i, i + 4);
+                    groups.push(group ? group.padEnd(4, '•') : '••••');
+                }
+                previewNumber.textContent = groups.join(' ');
+            }
+
+            if (brandVisa && brandMastercard) {
+                var brand = detectCardBrand(digits);
+                brandVisa.hidden = brand !== 'visa';
+                brandMastercard.hidden = brand !== 'mastercard';
+            }
         });
     }
 
@@ -91,6 +132,10 @@ document.addEventListener('DOMContentLoaded', function () {
         expiryInput.addEventListener('input', function () {
             var digits = expiryInput.value.replace(/\D/g, '').slice(0, 4);
             expiryInput.value = digits.length > 2 ? digits.slice(0, 2) + '/' + digits.slice(2) : digits;
+
+            if (previewExpiry) {
+                previewExpiry.textContent = expiryInput.value || 'MM/YY';
+            }
         });
     }
 

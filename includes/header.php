@@ -18,11 +18,15 @@ $pageCss = $pageCss ?? [];
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Genuine and quality vehicle spare parts, delivered island-wide.">
 <title><?php echo e($pageTitle); ?> | <?php echo e(SITE_NAME); ?></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/vendor/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/base.css">
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/base.css?v=<?php echo (int) @filemtime(__DIR__ . '/../assets/css/base.css'); ?>">
 <?php foreach ($pageCss as $css): ?>
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/<?php echo e($css); ?>">
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/<?php echo e($css); ?>?v=<?php echo (int) @filemtime(__DIR__ . '/../assets/css/' . $css); ?>">
 <?php endforeach; ?>
 </head>
 <body>
