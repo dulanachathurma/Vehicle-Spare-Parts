@@ -120,8 +120,15 @@ function calculateTotals(float $subtotal): array
  *
  * @return array{orderId:int, finalAmount:float}
  */
-function placeOrder(PDO $db, int $userId, string $recipientName, string $recipientPhone, string $shippingAddress, int $gatewayId): array
-{
+function placeOrder(
+    PDO $db,
+    int $userId,
+    string $recipientName,
+    string $recipientPhone,
+    string $shippingAddress,
+    int $gatewayId,
+    bool $decrementStock = true
+): array {
     $cart = getOrCreateCart($db, $userId);
     $items = cartItemsForCart($db, (int) $cart['cartID']);
 
@@ -150,13 +157,17 @@ function placeOrder(PDO $db, int $userId, string $recipientName, string $recipie
         $itemStmt = $db->prepare(
             'INSERT INTO order_item (orderID, partID, quantity, unitPrice, subtotal) VALUES (?, ?, ?, ?, ?)'
         );
-        // The stockQty >= ? guard makes this an atomic, race-safe
-        // decrement: if someone else bought the stock between the cart
-        // page loading and this transaction running, rowCount() is 0
-        // and we roll back instead of allowing negative stock.
-        $stockStmt = $db->prepare(
-            'UPDATE spare_part SET stockQty = stockQty - ? WHERE partID = ? AND stockQty >= ?'
-        );
+
+        $stockStmt = null;
+        if ($decrementStock) {
+            // The stockQty >= ? guard makes this an atomic, race-safe
+            // decrement: if someone else bought the stock between the cart
+            // page loading and this transaction running, rowCount() is 0
+            // and we roll back instead of allowing negative stock.
+            $stockStmt = $db->prepare(
+                'UPDATE spare_part SET stockQty = stockQty - ? WHERE partID = ? AND stockQty >= ?'
+            );
+        }
 
         foreach ($items as $item) {
             $quantity = (int) $item['quantity'];
@@ -164,9 +175,11 @@ function placeOrder(PDO $db, int $userId, string $recipientName, string $recipie
 
             $itemStmt->execute([$orderId, $item['partID'], $quantity, $item['price'], $lineSubtotal]);
 
-            $stockStmt->execute([$quantity, $item['partID'], $quantity]);
-            if ($stockStmt->rowCount() === 0) {
-                throw new RuntimeException('Stock changed while placing your order. Please review your cart and try again.');
+            if ($decrementStock && $stockStmt !== null) {
+                $stockStmt->execute([$quantity, $item['partID'], $quantity]);
+                if ($stockStmt->rowCount() === 0) {
+                    throw new RuntimeException('Stock changed while placing your order. Please review your cart and try again.');
+                }
             }
         }
 
@@ -201,14 +214,18 @@ function restoreStockForOrder(PDO $db, int $orderId): void
 
 /**
  * Customer-initiated cancellation. Only allowed while Pending or
- * Confirmed. Restores stock and marks the order Cancelled and its
- * payment Refunded in one transaction, per
- * docs/PROJECT_BRIEF.md, Section 6, Module 3's "Cancel order"
- * requirement.
+ * Confirmed. Restores stock (if previously deducted) and marks the order
+ * Cancelled and its payment Refunded in one transaction.
  */
 function cancelOrder(PDO $db, int $orderId, int $userId): void
 {
-    $stmt = $db->prepare('SELECT status FROM orders WHERE orderID = ? AND userID = ?');
+    $stmt = $db->prepare(
+        'SELECT o.status, p.gatewayID, p.status AS paymentStatus, g.gatewayName
+         FROM orders o
+         JOIN payment p ON p.orderID = o.orderID
+         JOIN payment_gateway g ON g.gatewayID = p.gatewayID
+         WHERE o.orderID = ? AND o.userID = ?'
+    );
     $stmt->execute([$orderId, $userId]);
     $order = $stmt->fetch();
 
@@ -222,7 +239,14 @@ function cancelOrder(PDO $db, int $orderId, int $userId): void
     $db->beginTransaction();
 
     try {
-        restoreStockForOrder($db, $orderId);
+        // Only restore stock if it was actually decremented:
+        // For Stripe orders, stock is only decremented upon successful payment.
+        $isStripe = stripos((string) ($order['gatewayName'] ?? ''), 'stripe') !== false;
+        $shouldRestoreStock = !$isStripe || $order['paymentStatus'] === 'Success';
+
+        if ($shouldRestoreStock) {
+            restoreStockForOrder($db, $orderId);
+        }
 
         $updateOrder = $db->prepare("UPDATE orders SET status = 'Cancelled' WHERE orderID = ?");
         $updateOrder->execute([$orderId]);
@@ -233,6 +257,7 @@ function cancelOrder(PDO $db, int $orderId, int $userId): void
         $updatePayment->execute([$orderId]);
 
         $db->commit();
+
     } catch (Throwable $e) {
         $db->rollBack();
         throw $e;

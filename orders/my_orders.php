@@ -11,13 +11,17 @@ $userId = currentUserId();
 $statusFilter = $_GET['status'] ?? '';
 $validStatuses = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
 
-$sql = 'SELECT * FROM orders WHERE userID = ?';
+$sql = 'SELECT o.*, p.status AS paymentStatus, g.gatewayName
+        FROM orders o
+        LEFT JOIN payment p ON p.orderID = o.orderID
+        LEFT JOIN payment_gateway g ON g.gatewayID = p.gatewayID
+        WHERE o.userID = ?';
 $params = [$userId];
 if (in_array($statusFilter, $validStatuses, true)) {
-    $sql .= ' AND status = ?';
+    $sql .= ' AND o.status = ?';
     $params[] = $statusFilter;
 }
-$sql .= ' ORDER BY orderDate DESC';
+$sql .= ' ORDER BY o.orderDate DESC';
 
 $stmt = $db->prepare($sql);
 $stmt->execute($params);
@@ -45,16 +49,21 @@ require __DIR__ . '/../includes/header.php';
     <p class="text-muted mt-2">No orders yet. <a href="<?php echo BASE_URL; ?>/catalogue/products.php">Start shopping</a>.</p>
     <?php else: ?>
     <table class="table-plain mt-2">
-        <thead><tr><th>Order #</th><th>Date</th><th>Status</th><th>Total</th><th></th></tr></thead>
+        <thead><tr><th>Order #</th><th>Date</th><th>Order Status</th><th>Payment</th><th>Total</th><th></th></tr></thead>
         <tbody>
         <?php foreach ($orders as $order): ?>
             <tr>
                 <td>#<?php echo (int) $order['orderID']; ?></td>
                 <td><?php echo e(date('Y-m-d', strtotime($order['orderDate']))); ?></td>
                 <td><span class="badge-status badge-status--<?php echo strtolower($order['status']); ?>"><?php echo e($order['status']); ?></span></td>
+                <td>
+                    <span class="badge-status badge-status--<?php echo strtolower($order['paymentStatus'] ?? 'pending'); ?>">
+                        <?php echo e($order['paymentStatus'] ?? 'Pending'); ?>
+                    </span>
+                </td>
                 <td><?php echo formatMoney((float) $order['finalAmount']); ?></td>
                 <td>
-                    <?php if ($order['status'] === 'Pending'): ?>
+                    <?php if ($order['status'] === 'Pending' || ($order['paymentStatus'] ?? '') === 'Failed'): ?>
                     <a class="btn btn-sm btn-primary" href="<?php echo BASE_URL; ?>/payment/pay.php?order=<?php echo (int) $order['orderID']; ?>">Pay Now</a>
                     <?php endif; ?>
                     <a class="btn btn-sm btn-outline" href="<?php echo BASE_URL; ?>/orders/order_details.php?id=<?php echo (int) $order['orderID']; ?>">View</a>

@@ -25,19 +25,30 @@ if (!empty($stockProblems)) {
 }
 
 $totals = calculateTotals(cartTotal($items));
-$gateways = $db->query('SELECT * FROM payment_gateway WHERE isActive = 1 ORDER BY gatewayName')->fetchAll();
+$gateways = $db->query('SELECT * FROM payment_gateway WHERE isActive = 1 ORDER BY gatewayID DESC')->fetchAll();
 
 /** A small icon + subtitle per payment gateway, purely decorative. */
 function gatewayVisual(string $gatewayName): array
 {
+    if (stripos($gatewayName, 'stripe') !== false) {
+        return [
+            'name' => 'Stripe Card Payment',
+            'icon' => '<span class="ord-pay-method-cards"><span class="ord-mini-visa">VISA</span><span class="ord-mini-mc"><i></i><i></i></span></span>',
+            'sub' => 'Visa, Mastercard, Amex via Stripe Secure Checkout',
+        ];
+    }
+
+
     if (stripos($gatewayName, 'payhere') !== false) {
         return [
+            'name' => $gatewayName,
             'icon' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path><path d="M6 15h4"></path></svg>',
             'sub' => 'Cards, eZ Cash, mobile banking and more',
         ];
     }
 
     return [
+        'name' => $gatewayName,
         'icon' => '<span class="ord-pay-method-cards"><span class="ord-mini-visa">VISA</span><span class="ord-mini-mc"><i></i><i></i></span></span>',
         'sub' => 'Visa, Mastercard and other major cards',
     ];
@@ -82,7 +93,7 @@ require __DIR__ . '/../includes/header.php';
                     <input type="radio" name="gateway_id" value="<?php echo (int) $gateway['gatewayID']; ?>" <?php echo $i === 0 ? 'checked' : ''; ?> required>
                     <span class="ord-pay-method-icon"><?php echo $visual['icon']; ?></span>
                     <span class="ord-pay-method-text">
-                        <span class="ord-pay-method-name"><?php echo e($gateway['gatewayName']); ?></span>
+                        <span class="ord-pay-method-name"><?php echo e($visual['name'] ?? $gateway['gatewayName']); ?></span>
                         <span class="ord-pay-method-sub"><?php echo e($visual['sub']); ?></span>
                     </span>
                     <span class="ord-pay-method-check">
@@ -92,7 +103,7 @@ require __DIR__ . '/../includes/header.php';
                 <?php endforeach; ?>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block" <?php echo empty($gateways) ? 'disabled' : ''; ?>>Place Order</button>
+            <button type="submit" class="btn btn-primary btn-block" <?php echo empty($gateways) ? 'disabled' : ''; ?>>Proceed to Payment</button>
         </form>
 
         <aside class="card ord-order-summary">

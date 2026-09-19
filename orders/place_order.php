@@ -24,10 +24,23 @@ if ($recipientName === '' || $recipientPhone === '' || $shippingAddress === '' |
     redirect('orders/checkout.php');
 }
 
+$gwStmt = $db->prepare('SELECT gatewayName FROM payment_gateway WHERE gatewayID = ?');
+$gwStmt->execute([$gatewayId]);
+$gw = $gwStmt->fetch();
+
+$isStripe = $gw && stripos((string) $gw['gatewayName'], 'stripe') !== false;
+
 try {
-    $result = placeOrder($db, $userId, $recipientName, $recipientPhone, $shippingAddress, $gatewayId);
-    redirect('payment/pay.php?order=' . $result['orderId']);
+    // For Stripe, stock is decremented upon verified payment to prevent premature or duplicate stock reduction
+    $result = placeOrder($db, $userId, $recipientName, $recipientPhone, $shippingAddress, $gatewayId, !$isStripe);
+
+    if ($isStripe) {
+        redirect('payment/stripe_checkout.php?order=' . $result['orderId']);
+    } else {
+        redirect('payment/pay.php?order=' . $result['orderId']);
+    }
 } catch (Throwable $e) {
     setFlash('error', 'We could not place your order: ' . $e->getMessage());
     redirect('orders/cart.php');
 }
+
