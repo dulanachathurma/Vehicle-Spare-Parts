@@ -48,6 +48,16 @@
     --color-border: #334155;
     --color-bg: #0f172a;
     --color-surface: #1e293b;
+
+    /* Badge / alert semantic colors — dark-mode friendly */
+    --color-success:    #34d399;
+    --color-success-bg: #064e3b;
+    --color-danger:     #f87171;
+    --color-danger-bg:  #450a0a;
+    --color-warning:    #fbbf24;
+    --color-warning-bg: #451a03;
+    --color-info:       #38bdf8;
+    --color-info-bg:    #0c2a4a;
 }
 
 [data-theme="dark"] h1,
@@ -127,6 +137,16 @@
 
 [data-theme="dark"] .dropdown-divider {
     border-color: #334155;
+}
+
+/* Badge overrides — badges use their own colors, not generic span color */
+[data-theme="dark"] .badge-status {
+    color: unset;
+}
+
+[data-theme="dark"] .badge-status--shipped {
+    background: #2d2560;
+    color: #a89fee;
 }
 
 * {
