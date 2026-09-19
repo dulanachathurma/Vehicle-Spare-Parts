@@ -149,6 +149,16 @@
     border-color: #334155;
 }
 
+/* text-muted is too faint in dark mode — lighten it so it's legible */
+[data-theme="dark"] .text-muted {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .ord-pay-secure-head p.text-muted,
+[data-theme="dark"] .ord-pay-card p.text-muted {
+    color: #cbd5e1 !important;
+}
+
 /* Badge overrides — badges use their own colors, not generic span color */
 [data-theme="dark"] .badge-status {
     color: unset;
