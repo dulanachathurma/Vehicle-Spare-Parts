@@ -39,6 +39,96 @@
     --font-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+[data-theme="dark"] {
+    --color-primary: #3b82f6;
+    --color-primary-dark: #2563eb;
+    --color-primary-light: #1e293b;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-border: #334155;
+    --color-bg: #0f172a;
+    --color-surface: #1e293b;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .table-plain th {
+    background: #0f172a;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .table-plain tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .form-label {
+    color: #cbd5e1;
+}
+
+/* Payment method cards */
+[data-theme="dark"] .ord-pay-method-name {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .ord-pay-method-icon {
+    color: #60a5fa;
+}
+
+/* Cards, panels, and any element with hardcoded white background */
+[data-theme="dark"] .card,
+[data-theme="dark"] .card-title {
+    color: #f1f5f9;
+}
+
+/* Table cells and all p, span, li, td text */
+[data-theme="dark"] p,
+[data-theme="dark"] td,
+[data-theme="dark"] th,
+[data-theme="dark"] li,
+[data-theme="dark"] span,
+[data-theme="dark"] label {
+    color: var(--color-text);
+}
+
+/* Inputs and selects */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #334155;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: #64748b;
+}
+
+/* Dropdown menus */
+[data-theme="dark"] .dropdown-menu {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: #334155;
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-color: #334155;
+}
+
 * {
     box-sizing: border-box;
 }
