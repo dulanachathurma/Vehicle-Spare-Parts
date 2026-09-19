@@ -18,3 +18,11 @@ define('DB_PASS', '');
 // then copy the Merchant ID and Merchant Secret from Integrations.
 define('PAYHERE_MERCHANT_ID', 'your-sandbox-merchant-id');
 define('PAYHERE_MERCHANT_SECRET', 'your-sandbox-merchant-secret');
+
+// --- Stripe Payment Gateway (Test Mode) --------------------------------
+// Get your test API keys from https://dashboard.stripe.com/test/apikeys
+define('STRIPE_PUBLISHABLE_KEY', 'pk_test_your_publishable_key_here');
+define('STRIPE_SECRET_KEY', 'sk_test_your_secret_key_here');
+// Get your webhook signing secret from Stripe CLI or Dashboard Webhooks
+define('STRIPE_WEBHOOK_SECRET', 'whsec_your_webhook_signing_secret_here');
+define('STRIPE_CURRENCY', 'lkr'); // Default currency (e.g. lkr or usd)
