@@ -14,12 +14,13 @@
     align-items: center;
     gap: 1rem;
     justify-content: flex-end;
-    margin-top: 1rem;
+    margin-top: 1.25rem;
     flex-wrap: wrap;
 }
 
 .ord-cart-total {
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 1.1rem;
     margin-right: auto;
 }
 
@@ -37,7 +38,7 @@
 
 .ord-checkout-layout {
     display: flex;
-    gap: 1.5rem;
+    gap: 1.75rem;
     align-items: flex-start;
     flex-wrap: wrap;
 }
@@ -48,15 +49,164 @@
 }
 
 .ord-order-summary {
-    flex: 0 0 300px;
+    flex: 0 0 320px;
+    background: var(--color-primary-light);
+    border-color: var(--color-primary-light);
 }
 
 .ord-gateway-option {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0;
+    gap: 0.6rem;
+    padding: 0.65rem 0.85rem;
     font-size: 0.95rem;
+    font-weight: 500;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    margin-bottom: 0.5rem;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.ord-gateway-option:hover {
+    border-color: var(--color-primary);
+}
+
+.ord-gateway-option:has(input:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+/* --- Payment method picker (checkout.php) --- */
+
+.ord-pay-method {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.9rem 1rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    margin-bottom: 0.7rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ord-pay-method input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.ord-pay-method:hover {
+    border-color: var(--color-primary);
+}
+
+.ord-pay-method:has(input:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+    box-shadow: var(--shadow-sm);
+}
+
+.ord-pay-method-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 32px;
+    flex-shrink: 0;
+    color: var(--color-primary-dark);
+}
+
+.ord-pay-method-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.ord-pay-method-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ord-pay-method-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.ord-pay-method-sub {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+}
+
+.ord-pay-method-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: var(--color-border);
+    flex-shrink: 0;
+    transition: background-color 0.15s ease;
+}
+
+.ord-pay-method-check svg {
+    width: 13px;
+    height: 13px;
+}
+
+.ord-pay-method:has(input:checked) .ord-pay-method-check {
+    background: var(--color-success);
+}
+
+/* Small stylised card-network chips (not real logos) used as a generic
+   "cards accepted" icon on the Simulated Card Payment method. */
+
+.ord-pay-method-cards {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.ord-mini-visa {
+    background: #1a3d8f;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 0.03em;
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+}
+
+.ord-mini-mc {
+    display: inline-flex;
+    align-items: center;
+    width: 26px;
+    height: 18px;
+    position: relative;
+}
+
+.ord-mini-mc i {
+    position: absolute;
+    top: 1px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: block;
+}
+
+.ord-mini-mc i:first-child {
+    left: 0;
+    background: #eb5b2f;
+}
+
+.ord-mini-mc i:last-child {
+    left: 8px;
+    background: #f2a623;
+    mix-blend-mode: multiply;
 }
 
 .ord-summary-list {
@@ -69,7 +219,7 @@
     display: flex;
     justify-content: space-between;
     font-size: 0.85rem;
-    padding: 0.2rem 0;
+    padding: 0.25rem 0;
     color: var(--color-text-muted);
 }
 
@@ -80,11 +230,12 @@
 }
 
 .ord-summary-final {
-    font-weight: 700;
-    font-size: 1.1rem;
-    border-top: 1px solid var(--color-border);
-    padding-top: 0.5rem;
-    margin-top: 0.5rem !important;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--color-primary-dark);
+    border-top: 1px dashed var(--color-primary);
+    padding-top: 0.6rem;
+    margin-top: 0.6rem !important;
 }
 
 /* --- Payment pages --- */
@@ -94,10 +245,148 @@
     padding: 2rem 0;
 }
 
+.ord-pay-wrap {
+    max-width: 460px;
+    margin: 0 auto;
+}
+
 .ord-pay-card,
 .ord-confirmation-card {
     max-width: 480px;
     margin: 0 auto;
+    box-shadow: var(--shadow-lg);
+}
+
+/* --- Live card preview --- */
+
+.ord-card-preview {
+    background:
+        radial-gradient(circle at 85% 10%, rgba(255, 255, 255, 0.14), transparent 45%),
+        linear-gradient(135deg, var(--color-primary-dark), var(--color-primary) 70%, #2478cc);
+    color: #fff;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow-lg);
+}
+
+.ord-card-preview-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+}
+
+.ord-card-chip {
+    display: block;
+    width: 38px;
+    height: 28px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #f2d98a, #d9b358);
+}
+
+.ord-card-brand {
+    display: flex;
+    align-items: center;
+    min-height: 22px;
+}
+
+.ord-card-preview-number {
+    font-family: 'Courier New', monospace;
+    font-size: 1.3rem;
+    letter-spacing: 0.12em;
+    margin: 0 0 1.5rem;
+}
+
+.ord-card-preview-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.ord-card-preview-label {
+    display: block;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 0.2rem;
+}
+
+.ord-card-preview-value {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* --- Secure payment header + trust copy --- */
+
+.ord-pay-secure-head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+}
+
+.ord-pay-lock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    flex-shrink: 0;
+}
+
+.ord-pay-lock svg {
+    width: 20px;
+    height: 20px;
+}
+
+.ord-pay-trust {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin: 0.85rem 0 0;
+}
+
+.ord-pay-trust svg {
+    width: 15px;
+    height: 15px;
+    color: var(--color-success);
+    flex-shrink: 0;
+}
+
+.ord-pay-testnote {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.85rem;
+    margin: 1rem 0 0;
+}
+
+.ord-pay-simulate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.ord-confirmation-card {
+    text-align: center;
+    border-top: 4px solid var(--color-success);
 }
 
 .ord-mock-card-row {
@@ -120,7 +409,7 @@
     display: flex;
     list-style: none;
     padding: 0;
-    margin: 1rem 0;
+    margin: 1.5rem 0;
     counter-reset: ord-step;
 }
 
@@ -129,8 +418,9 @@
     text-align: center;
     position: relative;
     font-size: 0.8rem;
+    font-weight: 500;
     color: var(--color-text-muted);
-    padding-top: 1.75rem;
+    padding-top: 2.1rem;
 }
 
 .ord-timeline li::before {
@@ -140,21 +430,22 @@
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 1.5rem;
-    height: 1.5rem;
-    line-height: 1.5rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    line-height: 1.75rem;
     border-radius: 50%;
     background: var(--color-border);
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
 }
 
 .ord-timeline li::after {
     content: '';
     position: absolute;
-    top: 0.75rem;
-    left: calc(50% + 1rem);
-    width: calc(100% - 1.5rem);
+    top: 0.875rem;
+    left: calc(50% + 1.1rem);
+    width: calc(100% - 1.75rem);
     height: 2px;
     background: var(--color-border);
 }
@@ -165,7 +456,7 @@
 
 .ord-timeline li.is-done {
     color: var(--color-success);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .ord-timeline li.is-done::before {
@@ -188,8 +479,9 @@
     margin: 0 auto;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 2rem;
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
 }
 
 @media print {
@@ -202,5 +494,6 @@
     .ord-receipt-paper {
         border: none;
         padding: 0;
+        box-shadow: none;
     }
 }
