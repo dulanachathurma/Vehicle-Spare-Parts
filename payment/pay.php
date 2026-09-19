@@ -56,6 +56,8 @@ require __DIR__ . '/../includes/header.php';
 
         <?php if (stripos($order['gatewayName'], 'payhere') !== false): ?>
         <a class="btn btn-primary btn-block" href="<?php echo BASE_URL; ?>/payment/payhere_checkout.php?order=<?php echo (int) $orderId; ?>">Pay with PayHere</a>
+        <?php elseif (stripos($order['gatewayName'], 'stripe') !== false): ?>
+        <a class="btn btn-primary btn-block" href="<?php echo BASE_URL; ?>/payment/stripe_checkout.php?order=<?php echo (int) $orderId; ?>">Pay Securely with Stripe</a>
         <?php else: ?>
         <a class="btn btn-primary btn-block" href="<?php echo BASE_URL; ?>/payment/mock_gateway.php?order=<?php echo (int) $orderId; ?>">Pay Now</a>
         <?php endif; ?>
