@@ -26,11 +26,35 @@ any code.
       two payment-gateway rows are already seeded by `seed_core.sql`; see
       `docs/module1.md` for why, and drop one of the two if you import
       both)
+   5. Every file in `database/migrations/`, in numeric order (see
+      "Database migrations" below).
 5. Copy `config/config.local.example.php` to `config/config.local.php`
    and fill in your own database credentials (and, later, your PayHere
    sandbox Merchant ID/Secret). This file is git-ignored and must never
    be committed.
 6. Open `http://localhost/vehicle-spare-parts/`.
+
+## Database migrations
+
+`database/schema.sql` is frozen after the first commit (Section 3, Rule
+3) - a feature added later that needs a new column or table adds a
+numbered file to `database/migrations/` instead of editing it. These
+are **not** imported automatically by `scripts/setup_db.bat`/`.sh` or
+the Docker dev environment, so:
+
+- **First-time setup**: import every file in `database/migrations/`,
+  in numeric order, right after the seed files (see step 4 above).
+- **Pulling later updates**: after `git pull`, check
+  `database/migrations/` for any new numbered file you haven't run yet
+  against your own database, and import it. Skipping this shows up as
+  a SQL error the first time the new feature runs (e.g. "Unknown
+  column" or "Table doesn't exist"), not as a failure to pull.
+
+Currently: `004_order_contact_info.sql` (adds `recipientName` /
+`recipientPhone` to `orders`, for the name/phone fields on checkout)
+and `005_return_requests.sql` (adds the `return_request` table, for
+customers requesting a return on a Delivered order) still need to be
+run manually against any database created before they were added.
 
 ## Seed accounts
 
