@@ -39,6 +39,136 @@
     --font-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+[data-theme="dark"] {
+    --color-primary: #3b82f6;
+    --color-primary-dark: #2563eb;
+    --color-primary-light: #1e293b;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-border: #334155;
+    --color-bg: #0f172a;
+    --color-surface: #1e293b;
+
+    /* Badge / alert semantic colors — dark-mode friendly */
+    --color-success:    #34d399;
+    --color-success-bg: #064e3b;
+    --color-danger:     #f87171;
+    --color-danger-bg:  #450a0a;
+    --color-warning:    #fbbf24;
+    --color-warning-bg: #451a03;
+    --color-info:       #38bdf8;
+    --color-info-bg:    #0c2a4a;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .table-plain th {
+    background: #0f172a;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .table-plain tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .form-label {
+    color: #cbd5e1;
+}
+
+/* Payment method cards */
+[data-theme="dark"] .ord-pay-method-name {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .ord-pay-method-icon {
+    color: #60a5fa;
+}
+
+/* Cards, panels, and any element with hardcoded white background */
+[data-theme="dark"] .card,
+[data-theme="dark"] .card-title {
+    color: #f1f5f9;
+}
+
+/* Table cells and all p, span, li, td text */
+[data-theme="dark"] p,
+[data-theme="dark"] td,
+[data-theme="dark"] th,
+[data-theme="dark"] li,
+[data-theme="dark"] label {
+    color: var(--color-text);
+}
+
+/* span gets its own rule at lower specificity so badge-status can override it */
+[data-theme="dark"] span:not(.badge-status):not(.nav-cart-badge) {
+    color: var(--color-text);
+}
+
+/* Part thumbnail placeholder — dark-friendly background */
+[data-theme="dark"] .part-thumb {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: #64748b;
+}
+
+/* Inputs and selects */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #334155;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: #64748b;
+}
+
+/* Dropdown menus */
+[data-theme="dark"] .dropdown-menu {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: #334155;
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-color: #334155;
+}
+
+/* text-muted is too faint in dark mode — lighten it so it's legible */
+[data-theme="dark"] .text-muted {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .ord-pay-secure-head p.text-muted,
+[data-theme="dark"] .ord-pay-card p.text-muted {
+    color: #cbd5e1 !important;
+}
+
+/* Badge overrides — badges use their own colors, not generic span color */
+[data-theme="dark"] .badge-status {
+    color: unset;
+}
+
+[data-theme="dark"] .badge-status--shipped {
+    background: #2d2560;
+    color: #a89fee;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -970,6 +1100,16 @@ input[type="radio"] {
 .home-category-tile:nth-child(8n+7) { --home-cat-tint: #fdecea; --home-cat-color: #c0392b; }
 .home-category-tile:nth-child(8n+8) { --home-cat-tint: #e7f6f6; --home-cat-color: #0d8c8c; }
 
+/* Dark mode: replace light pastels with deep vivid dark-friendly tints */
+[data-theme="dark"] .home-category-tile:nth-child(8n+1) { --home-cat-tint: #1e3a5f; --home-cat-color: #60a5fa; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+2) { --home-cat-tint: #4a2008; --home-cat-color: #fb923c; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+3) { --home-cat-tint: #064e3b; --home-cat-color: #34d399; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+4) { --home-cat-tint: #2e1065; --home-cat-color: #c084fc; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+5) { --home-cat-tint: #0c2a4a; --home-cat-color: #38bdf8; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+6) { --home-cat-tint: #451a03; --home-cat-color: #fbbf24; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+7) { --home-cat-tint: #450a0a; --home-cat-color: #f87171; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+8) { --home-cat-tint: #042f2e; --home-cat-color: #2dd4bf; }
+
 .home-category-tile:hover {
     border-color: transparent;
     box-shadow: var(--shadow-lg);
@@ -1165,6 +1305,25 @@ input[type="radio"] {
 .home-why-icon--accent  { background: #fdece0; color: var(--color-accent-dark); }
 .home-why-icon--info    { background: var(--color-info-bg); color: var(--color-info); }
 .home-why-icon--success { background: var(--color-success-bg); color: var(--color-success); }
+
+/* Dark mode overrides for Why Shop With Us section */
+[data-theme="dark"] .home-why {
+    background: linear-gradient(180deg, #0f172a, #1e293b);
+}
+
+[data-theme="dark"] .home-why-title {
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .home-why-icon--accent {
+    background: #4a2008;
+    color: #fb923c;
+}
+
+[data-theme="dark"] .home-why-icon--primary {
+    background: #1e3a5f;
+    color: #60a5fa;
+}
 
 .home-why-title {
     font-weight: 700;
