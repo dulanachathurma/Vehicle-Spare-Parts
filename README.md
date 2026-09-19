@@ -1,5 +1,7 @@
 # AutoParts Lanka - Vehicle Spare Parts Management System (VSPMS)
 
+> **Live Hosted Website:** [https://spare-parts.infy.click](https://spare-parts.infy.click)
+
 FROZEN: see `docs/PROJECT_BRIEF.md`, Section 3. This file is set up once
 by Module 1 and not edited by later modules.
 
