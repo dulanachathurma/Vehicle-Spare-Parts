@@ -12,7 +12,12 @@ $statusFilter = $_GET['status'] ?? '';
 $validStatuses = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
 $viewId = isset($_GET['id']) ? (int) $_GET['id'] : null;
 
-$sql = 'SELECT o.*, u.username, u.email FROM orders o JOIN registered_user u ON u.userID = o.userID WHERE 1=1';
+$sql = 'SELECT o.*, u.username, u.email, p.status AS paymentStatus, g.gatewayName
+        FROM orders o
+        JOIN registered_user u ON u.userID = o.userID
+        LEFT JOIN payment p ON p.orderID = o.orderID
+        LEFT JOIN payment_gateway g ON g.gatewayID = p.gatewayID
+        WHERE 1=1';
 $params = [];
 if (in_array($statusFilter, $validStatuses, true)) {
     $sql .= ' AND o.status = ?';
@@ -73,10 +78,10 @@ require __DIR__ . '/../../includes/header.php';
             </form>
 
             <table class="table-plain mt-2">
-                <thead><tr><th>Order #</th><th>Customer</th><th>Date</th><th>Status</th><th>Total</th><th></th></tr></thead>
+                <thead><tr><th>Order #</th><th>Customer</th><th>Date</th><th>Status</th><th>Payment</th><th>Total</th><th></th></tr></thead>
                 <tbody>
                 <?php if (empty($orders)): ?>
-                    <tr><td colspan="6" class="text-muted">No orders yet.</td></tr>
+                    <tr><td colspan="7" class="text-muted">No orders yet.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($orders as $order): ?>
                     <tr>
@@ -84,6 +89,11 @@ require __DIR__ . '/../../includes/header.php';
                         <td><?php echo e($order['username']); ?></td>
                         <td><?php echo e(date('Y-m-d', strtotime($order['orderDate']))); ?></td>
                         <td><span class="badge-status badge-status--<?php echo strtolower($order['status']); ?>"><?php echo e($order['status']); ?></span></td>
+                        <td>
+                            <span class="badge-status badge-status--<?php echo strtolower($order['paymentStatus'] ?? 'pending'); ?>">
+                                <?php echo e($order['paymentStatus'] ?? 'Pending'); ?>
+                            </span>
+                        </td>
                         <td><?php echo formatMoney((float) $order['finalAmount']); ?></td>
                         <td>
                             <a class="btn btn-sm btn-outline" href="<?php echo BASE_URL; ?>/admin/orders/manage_orders.php?id=<?php echo (int) $order['orderID']; ?><?php echo $statusFilter ? '&status=' . urlencode($statusFilter) : ''; ?>">View</a>
@@ -116,13 +126,23 @@ require __DIR__ . '/../../includes/header.php';
 
                 <?php if ($viewPayment): ?>
                 <p>
-                    Payment: <?php echo e($viewPayment['gatewayName']); ?> -
+                    Payment: <strong><?php echo e($viewPayment['gatewayName']); ?></strong> &middot; Status:
                     <span class="badge-status badge-status--<?php echo strtolower($viewPayment['status']); ?>"><?php echo e($viewPayment['status']); ?></span>
+                    <?php if (!empty($viewPayment['transactionID'])): ?>
+                    &middot; Ref: <code><?php echo e($viewPayment['transactionID']); ?></code>
+                    <?php endif; ?>
+                    <?php if (!empty($viewPayment['stripe_payment_intent_id'])): ?>
+                    &middot; Stripe PI: <code><?php echo e($viewPayment['stripe_payment_intent_id']); ?></code>
+                    <?php endif; ?>
+                    <?php if (!empty($viewPayment['paidAt'])): ?>
+                    &middot; Paid At: <?php echo e(date('Y-m-d H:i', strtotime($viewPayment['paidAt']))); ?>
+                    <?php endif; ?>
                     <?php if ((float) $viewPayment['refundAmount'] > 0): ?>
-                    (Refunded <?php echo formatMoney((float) $viewPayment['refundAmount']); ?>)
+                    &middot; (Refunded <?php echo formatMoney((float) $viewPayment['refundAmount']); ?>)
                     <?php endif; ?>
                 </p>
                 <?php endif; ?>
+
 
                 <form method="post" action="<?php echo BASE_URL; ?>/admin/orders/update_order_status.php" class="adm-inline-form">
                     <?php echo csrfField(); ?>
