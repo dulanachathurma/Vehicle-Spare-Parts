@@ -1,0 +1,31 @@
+/* assets/css/auth.css - styling for all auth/ pages. Classes prefixed auth-. */
+
+.auth-container {
+    max-width: 460px;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.auth-card {
+    margin-bottom: 1.5rem;
+    border-top: 4px solid var(--color-primary);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-card .card-title {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 1.25rem;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.auth-switch a {
+    font-weight: 600;
+}

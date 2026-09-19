@@ -1,0 +1,211 @@
+/* assets/css/admin.css - admin tables, forms, sidebar polish, tree
+   view and status badges for every admin/ page across all four
+   modules. Classes prefixed adm- per docs/PROJECT_BRIEF.md, Section 4. */
+
+.adm-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Dashboard summary cards (Module 1) --------------------------------- */
+
+.adm-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1.1rem;
+}
+
+.adm-dashboard-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top: 4px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    color: var(--color-text);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.adm-dashboard-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.adm-dashboard-card-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #101828;
+}
+
+.adm-dashboard-card-label {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.adm-dashboard-card--danger { border-top-color: var(--color-danger); }
+.adm-dashboard-card--warning { border-top-color: var(--color-warning); }
+.adm-dashboard-card--success { border-top-color: var(--color-success); }
+.adm-dashboard-card--info { border-top-color: var(--color-info); }
+.adm-dashboard-card--accent { border-top-color: var(--color-accent); }
+
+/* --- Filter bars ---------------------------------------------------------- */
+
+.adm-filter-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.25rem;
+}
+
+.adm-filter-bar .form-group {
+    margin-bottom: 0;
+}
+
+.adm-filter-bar .form-control {
+    width: auto;
+    min-width: 160px;
+}
+
+/* --- Inline forms embedded inside table cells ----------------------------- */
+
+.adm-inline-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.adm-inline-form .form-group {
+    margin-bottom: 0;
+}
+
+/* --- Two-column layout (form + tree, form + list) --------------------------- */
+
+.adm-two-col {
+    display: grid;
+    grid-template-columns: minmax(280px, 380px) 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .adm-two-col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Part add/edit form grid --------------------------------------------- */
+
+.adm-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.adm-image-preview-target {
+    display: block;
+    max-width: 160px;
+    max-height: 160px;
+    margin-top: 0.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    object-fit: cover;
+    box-shadow: var(--shadow-sm);
+}
+
+/* --- Category tree view ----------------------------------------------------- */
+
+.adm-tree,
+.adm-tree-children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.adm-tree-children {
+    margin-left: 1.5rem;
+    margin-top: 0.35rem;
+}
+
+.adm-tree > li {
+    margin-bottom: 0.5rem;
+}
+
+.adm-tree-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    border: 1px solid transparent;
+    transition: border-color 0.15s ease;
+}
+
+.adm-tree-row:hover {
+    border-color: var(--color-border);
+}
+
+.adm-tree-toggle {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.adm-tree-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+}
+
+.adm-tree-delete {
+    background: none;
+    border: none;
+    color: var(--color-danger);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0;
+}
+
+/* --- Stock alerts ----------------------------------------------------------- */
+
+.adm-stock-low {
+    color: var(--color-danger);
+    font-weight: 700;
+}
+
+/* --- Requests (admin/requests/ and requests/ pages) -------------------------- */
+
+.req-form-page {
+    padding: 1.5rem 0;
+}
+
+.req-form-card {
+    max-width: 640px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-lg);
+}

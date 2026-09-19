@@ -18,15 +18,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 date_default_timezone_set('Asia/Colombo');
 
-define('BASE_URL', 'http://localhost/vehicle-spare-parts');
-define('SITE_NAME', 'AutoParts Lanka');
-define('CURRENCY', 'Rs');
-define('PRICE_RANGE_PERCENT', 15);
-define('TAX_RATE', 0);
-define('UPLOAD_DIR', __DIR__ . '/../uploads/parts/');
-define('UPLOAD_URL', BASE_URL . '/uploads/parts');
-define('PAYHERE_SANDBOX', true);
-
+// Load per-machine config first so it can override BASE_URL
 $localConfig = __DIR__ . '/config.local.php';
 if (file_exists($localConfig)) {
     require_once $localConfig;
@@ -36,6 +28,15 @@ if (file_exists($localConfig)) {
     // than fatal-erroring on a fresh checkout.
     require_once __DIR__ . '/config.local.example.php';
 }
+
+if (!defined('BASE_URL'))     define('BASE_URL', 'http://localhost/vehicle-spare-parts');
+define('SITE_NAME', 'AutoParts Lanka');
+define('CURRENCY', 'Rs');
+define('PRICE_RANGE_PERCENT', 15);
+define('TAX_RATE', 0);
+define('UPLOAD_DIR', __DIR__ . '/../uploads/parts/');
+if (!defined('UPLOAD_URL'))   define('UPLOAD_URL', BASE_URL . '/uploads/parts');
+define('PAYHERE_SANDBOX', true);
 
 require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/../includes/functions.php';

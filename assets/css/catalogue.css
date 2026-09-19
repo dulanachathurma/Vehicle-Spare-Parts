@@ -17,28 +17,31 @@
 
 .cat-sort-form .form-control {
     width: auto;
-    min-width: 180px;
+    min-width: 190px;
 }
 
 .cat-category-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1rem;
+    margin-top: 1.25rem;
 }
 
 .cat-chip {
     display: inline-block;
-    padding: 0.3rem 0.8rem;
+    padding: 0.4rem 0.9rem;
     border-radius: 999px;
     border: 1px solid var(--color-border);
     background: var(--color-surface);
     color: var(--color-text);
     font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
 }
 
 .cat-chip:hover {
     border-color: var(--color-primary);
+    color: var(--color-primary-dark);
     text-decoration: none;
 }
 
@@ -49,7 +52,9 @@
 }
 
 .cat-chip.is-removable {
-    background: var(--color-bg);
+    background: var(--color-primary-light);
+    border-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
 }
 
 .cat-chip-row {
@@ -63,16 +68,31 @@
 
 .cat-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 1.25rem;
 }
 
 .cat-card {
+    position: relative;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 1rem;
+    border-radius: var(--radius-lg);
+    padding: 1.1rem;
     text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.cat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+}
+
+.cat-card .badge-status {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
 }
 
 .cat-card-link {
@@ -85,30 +105,33 @@
 }
 
 .cat-card-link .part-thumb {
-    margin: 0 auto 0.5rem;
+    margin: 0 auto 0.75rem;
 }
 
 .cat-card-name {
-    font-weight: 500;
-    margin: 0.25rem 0 0;
+    font-weight: 600;
+    margin: 0.3rem 0 0;
+    font-size: 0.94rem;
 }
 
 .cat-card-meta {
     color: var(--color-text-muted);
     font-size: 0.8rem;
-    margin: 0.15rem 0;
+    margin: 0.2rem 0;
 }
 
 .cat-card-price {
-    color: var(--color-accent);
-    font-weight: 600;
-    margin: 0.15rem 0 0.5rem;
+    color: var(--color-accent-dark);
+    font-weight: 700;
+    margin: 0.2rem 0 0.5rem;
+    font-size: 1.02rem;
 }
 
 .cat-request-link {
     display: inline-block;
     margin-top: 0.4rem;
     font-size: 0.8rem;
+    font-weight: 600;
 }
 
 /* --- Search layout: sidebar + results --- */
@@ -120,13 +143,14 @@
 }
 
 .cat-filter-sidebar {
-    flex: 0 0 260px;
+    flex: 0 0 270px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 1rem;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
     position: sticky;
-    top: 1rem;
+    top: 5.5rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .cat-search-results {
@@ -138,7 +162,7 @@
     max-height: 180px;
     overflow-y: auto;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
     padding: 0.5rem 0.75rem;
 }
 
@@ -147,7 +171,7 @@
     align-items: center;
     gap: 0.4rem;
     font-size: 0.85rem;
-    padding: 0.15rem 0;
+    padding: 0.25rem 0;
 }
 
 .cat-checkbox input {
@@ -157,15 +181,16 @@
 .cat-price-slider {
     width: 100%;
     margin-bottom: 0.5rem;
+    accent-color: var(--color-primary);
 }
 
 .cat-price-range-note {
-    background: #e4f1f8;
+    background: var(--color-info-bg);
     color: var(--color-info);
     border: 1px solid #b7d9ea;
-    border-radius: var(--radius);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.85rem;
+    font-size: 0.88rem;
 }
 
 @media (max-width: 900px) {
@@ -184,10 +209,15 @@
 
 .cat-detail {
     display: flex;
-    gap: 2rem;
+    gap: 2.5rem;
     align-items: flex-start;
     flex-wrap: wrap;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .cat-detail-image .part-thumb {
@@ -200,20 +230,20 @@
 }
 
 .cat-detail-price {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-accent);
-    margin: 0.25rem 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-accent-dark);
+    margin: 0.4rem 0;
 }
 
 .cat-detail-specs {
-    margin: 1rem 0;
+    margin: 1.25rem 0;
 }
 
 .cat-detail-specs th {
     width: 180px;
     color: var(--color-text-muted);
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .cat-qty-group {

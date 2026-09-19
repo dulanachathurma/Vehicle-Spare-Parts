@@ -22,10 +22,24 @@ if (isLoggedIn() && function_exists('cartItemCount')) {
 ?>
 <nav class="navbar navbar-expand-lg navbar-main">
     <div class="container">
-        <a class="navbar-brand" href="<?php echo BASE_URL; ?>/index.php"><?php echo e(SITE_NAME); ?></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <a class="navbar-brand" href="<?php echo BASE_URL; ?>/index.php">
+            <span class="navbar-brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+            </span>
+            <?php echo e(SITE_NAME); ?>
+        </a>
+        <div class="d-flex align-items-center ms-auto order-lg-last">
+            <a href="#" id="themeToggle" title="Toggle Dark Mode" style="color: rgba(255, 255, 255, 0.88); padding: 0.5rem; margin-right: 0.5rem; display: flex; align-items: center; text-decoration: none;">
+                <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/catalogue/products.php">Shop</a></li>
@@ -36,6 +50,7 @@ if (isLoggedIn() && function_exists('cartItemCount')) {
                 <?php endif; ?>
             </ul>
             <ul class="navbar-nav">
+
                 <li class="nav-item">
                     <a class="nav-link nav-cart-link" href="<?php echo BASE_URL; ?>/orders/cart.php">
                         Cart
