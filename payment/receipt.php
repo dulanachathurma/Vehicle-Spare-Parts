@@ -47,6 +47,7 @@ require __DIR__ . '/../includes/header.php';
         <hr>
         <p>Receipt for Order #<?php echo (int) $order['orderID']; ?></p>
         <p>Date: <?php echo e(date('Y-m-d H:i', strtotime($order['orderDate']))); ?></p>
+        <p>Recipient: <?php echo e($order['recipientName'] ?? ''); ?> &middot; <?php echo e($order['recipientPhone'] ?? ''); ?></p>
         <p>Shipping Address: <?php echo e($order['shippingAddress']); ?></p>
 
         <table class="table-plain">

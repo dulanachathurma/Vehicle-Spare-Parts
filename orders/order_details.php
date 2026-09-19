@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/lib/return_helper.php';
 
 requireLogin();
 
@@ -35,6 +36,7 @@ $timeline = ['Pending', 'Confirmed', 'Shipped', 'Delivered'];
 $currentStep = array_search($order['status'], $timeline, true);
 $isCancelled = $order['status'] === 'Cancelled';
 $canCancel = in_array($order['status'], ['Pending', 'Confirmed'], true);
+$returnRequest = returnRequestForOrder($db, $orderId);
 
 $pageTitle = 'Order #' . $orderId;
 $pageCss = ['orders.css'];
@@ -58,6 +60,13 @@ require __DIR__ . '/../includes/header.php';
     <?php if (!empty($order['trackingNumber'])): ?>
     <p>Tracking Number: <strong><?php echo e($order['trackingNumber']); ?></strong></p>
     <?php endif; ?>
+
+    <div class="card mb-2">
+        <h2 class="card-title">Delivery Details</h2>
+        <p>Name: <?php echo e($order['recipientName'] ?? ''); ?></p>
+        <p>Phone: <?php echo e($order['recipientPhone'] ?? ''); ?></p>
+        <p>Address: <?php echo e($order['shippingAddress']); ?></p>
+    </div>
 
     <table class="table-plain mt-2">
         <thead><tr><th>Part</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
@@ -92,6 +101,27 @@ require __DIR__ . '/../includes/header.php';
         <input type="hidden" name="order_id" value="<?php echo (int) $order['orderID']; ?>">
         <button type="submit" class="btn btn-danger">Cancel Order</button>
     </form>
+    <?php endif; ?>
+
+    <?php if ($order['status'] === 'Delivered'): ?>
+    <div class="card mt-2">
+        <h2 class="card-title">Return / Refund</h2>
+        <?php if (!$returnRequest): ?>
+        <p class="text-muted">Not the right fit, or arrived damaged? You can request a return within 7 days of delivery.</p>
+        <a class="btn btn-outline" href="<?php echo BASE_URL; ?>/orders/submit_return.php?order=<?php echo (int) $order['orderID']; ?>">Return This Order</a>
+        <?php else: ?>
+        <p>Reason: <?php echo e($returnRequest['reasonCategory']); ?></p>
+        <?php if (!empty($returnRequest['description'])): ?>
+        <p>Details: <?php echo e($returnRequest['description']); ?></p>
+        <?php endif; ?>
+        <p>Status:
+            <span class="badge-status badge-status--<?php echo strtolower($returnRequest['status']); ?>"><?php echo e($returnRequest['status']); ?></span>
+        </p>
+        <?php if (!empty($returnRequest['adminNotes'])): ?>
+        <p class="text-muted">Note from our team: <?php echo e($returnRequest['adminNotes']); ?></p>
+        <?php endif; ?>
+        <?php endif; ?>
+    </div>
     <?php endif; ?>
 </div>
 

@@ -29,7 +29,9 @@ $stmt = $db->prepare(
 $stmt->execute([$orderId, $userId]);
 $order = $stmt->fetch();
 
-if (!$order || $order['paymentStatus'] !== 'Pending') {
+// Failed is retryable, same as Pending - only a Success/Refunded
+// payment is truly settled and should turn a customer away here.
+if (!$order || !in_array($order['paymentStatus'], ['Pending', 'Failed'], true)) {
     setFlash('error', 'This order is not awaiting payment.');
     redirect('orders/my_orders.php');
 }

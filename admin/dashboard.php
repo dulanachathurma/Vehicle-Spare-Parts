@@ -15,6 +15,7 @@ $lowStockCount = (int) $db->query(
     'SELECT COUNT(*) AS c FROM spare_part WHERE isActive = 1 AND stockQty <= minStockLevel'
 )->fetch()['c'];
 $pendingRequests = (int) $db->query("SELECT COUNT(*) AS c FROM product_request WHERE status = 'Pending'")->fetch()['c'];
+$pendingReturns = (int) $db->query("SELECT COUNT(*) AS c FROM return_request WHERE status = 'Pending'")->fetch()['c'];
 
 $cards = [
     [
@@ -46,6 +47,12 @@ $cards = [
         'value' => $pendingRequests,
         'link' => BASE_URL . '/admin/requests/manage_requests.php?status=Pending',
         'tone' => 'accent',
+    ],
+    [
+        'label' => 'Pending Returns',
+        'value' => $pendingReturns,
+        'link' => BASE_URL . '/admin/orders/manage_returns.php?status=Pending',
+        'tone' => 'warning',
     ],
 ];
 

@@ -41,6 +41,7 @@ function admNavActive(string $path, string $currentScript): string
 
         <p class="adm-nav-heading">Sales</p>
         <a class="adm-nav-link<?php echo admNavActive('manage_orders.php', $currentScript); ?>" href="<?php echo BASE_URL; ?>/admin/orders/manage_orders.php">Orders</a>
+        <a class="adm-nav-link<?php echo admNavActive('manage_returns.php', $currentScript); ?>" href="<?php echo BASE_URL; ?>/admin/orders/manage_returns.php">Return Requests</a>
         <a class="adm-nav-link<?php echo admNavActive('manage_gateways.php', $currentScript); ?>" href="<?php echo BASE_URL; ?>/admin/gateways/manage_gateways.php">Payment Gateways</a>
 
         <p class="adm-nav-heading">Requests</p>
