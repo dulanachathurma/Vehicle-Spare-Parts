@@ -27,5 +27,7 @@ INSERT INTO cart (userID) VALUES
 ((SELECT userID FROM registered_user WHERE username = 'jane_smith'));
 
 INSERT INTO payment_gateway (gatewayName, apiEndpoint, isActive, transactionFeeRate) VALUES
-('PayHere Sandbox', 'https://sandbox.payhere.lk/pay/checkout', 1, 3.30),
-('Simulated Card Payment', NULL, 1, 0.00);
+('PayHere Sandbox', 'https://sandbox.payhere.lk/pay/checkout', 0, 3.30),
+('Simulated Card Payment', NULL, 1, 0.00),
+('Stripe', 'https://api.stripe.com', 1, 2.90);
+

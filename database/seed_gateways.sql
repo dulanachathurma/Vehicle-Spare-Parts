@@ -14,9 +14,14 @@
 USE vspms_db;
 
 INSERT INTO payment_gateway (gatewayName, apiEndpoint, isActive, transactionFeeRate)
-SELECT 'PayHere Sandbox', 'https://sandbox.payhere.lk/pay/checkout', 1, 3.30
+SELECT 'PayHere Sandbox', 'https://sandbox.payhere.lk/pay/checkout', 0, 3.30
 WHERE NOT EXISTS (SELECT 1 FROM payment_gateway WHERE gatewayName = 'PayHere Sandbox');
 
 INSERT INTO payment_gateway (gatewayName, apiEndpoint, isActive, transactionFeeRate)
 SELECT 'Simulated Card Payment', NULL, 1, 0.00
 WHERE NOT EXISTS (SELECT 1 FROM payment_gateway WHERE gatewayName = 'Simulated Card Payment');
+
+INSERT INTO payment_gateway (gatewayName, apiEndpoint, isActive, transactionFeeRate)
+SELECT 'Stripe', 'https://api.stripe.com', 1, 2.90
+WHERE NOT EXISTS (SELECT 1 FROM payment_gateway WHERE gatewayName = 'Stripe');
+
