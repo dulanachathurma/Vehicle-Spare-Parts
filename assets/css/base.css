@@ -1100,6 +1100,16 @@ input[type="radio"] {
 .home-category-tile:nth-child(8n+7) { --home-cat-tint: #fdecea; --home-cat-color: #c0392b; }
 .home-category-tile:nth-child(8n+8) { --home-cat-tint: #e7f6f6; --home-cat-color: #0d8c8c; }
 
+/* Dark mode: replace light pastels with deep vivid dark-friendly tints */
+[data-theme="dark"] .home-category-tile:nth-child(8n+1) { --home-cat-tint: #1e3a5f; --home-cat-color: #60a5fa; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+2) { --home-cat-tint: #4a2008; --home-cat-color: #fb923c; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+3) { --home-cat-tint: #064e3b; --home-cat-color: #34d399; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+4) { --home-cat-tint: #2e1065; --home-cat-color: #c084fc; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+5) { --home-cat-tint: #0c2a4a; --home-cat-color: #38bdf8; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+6) { --home-cat-tint: #451a03; --home-cat-color: #fbbf24; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+7) { --home-cat-tint: #450a0a; --home-cat-color: #f87171; }
+[data-theme="dark"] .home-category-tile:nth-child(8n+8) { --home-cat-tint: #042f2e; --home-cat-color: #2dd4bf; }
+
 .home-category-tile:hover {
     border-color: transparent;
     box-shadow: var(--shadow-lg);
