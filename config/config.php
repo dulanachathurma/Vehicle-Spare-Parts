@@ -43,6 +43,8 @@ define('TAX_RATE', 0);
 define('UPLOAD_DIR', __DIR__ . '/../uploads/parts/');
 if (!defined('UPLOAD_URL'))   define('UPLOAD_URL', BASE_URL . '/uploads/parts');
 define('PAYHERE_SANDBOX', true);
+define('SUPPORT_WHATSAPP', '+94703587028');
+define('SUPPORT_WHATSAPP_URL', 'https://wa.me/94703587028');
 
 require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/../includes/functions.php';

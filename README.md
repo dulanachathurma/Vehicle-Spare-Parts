@@ -8,6 +8,7 @@
 [![Stripe](https://img.shields.io/badge/Stripe-v21.3-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com/)
 [![License](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
 [![Theme](https://img.shields.io/badge/UI-Light%20%26%20Dark%20Mode-8b5cf6?style=for-the-badge)](https://autopartslanka.wuaze.com/)
+[![WhatsApp Support](https://img.shields.io/badge/WhatsApp-%2B94_70_358_7028-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/94703587028)
 
 <br>
 
@@ -257,6 +258,15 @@ The application includes built-in compatibility for shared hosts like **Infinity
 * **Session Security**: Session identifiers are regenerated upon login (`session_regenerate_id(true)`) to prevent session fixation attacks.
 * **Credential Isolation**: Local credentials, database passwords, and payment secrets reside strictly in `config/config.local.php`, isolated from version control.
 * **Direct Access Denial**: Sensitive server-side directories (`/config`, `/database`, `/logs`, `/vendor`) are protected from direct HTTP access via `.htaccess` rewrite rules.
+
+---
+
+## 💬 Direct Support & Inquiries
+
+For customer support, order assistance, or part compatibility verification:
+* **Direct WhatsApp Support:** [+94 70 358 7028](https://wa.me/94703587028)
+* **Email:** [support@autopartslanka.lk](mailto:support@autopartslanka.lk)
+* **Store Location:** 123 Galle Road, Colombo 03, Sri Lanka
 
 ---
 

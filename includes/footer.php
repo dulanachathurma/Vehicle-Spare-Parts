@@ -31,7 +31,7 @@ $pageJs = $pageJs ?? [];
                 <p class="site-footer-heading">Get in Touch</p>
                 <ul class="site-footer-contact">
                     <li>123 Galle Road, Colombo 03, Sri Lanka</li>
-                    <li>+94 11 234 5678</li>
+                    <li><a href="https://wa.me/94703587028" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">+94 70 358 7028 (WhatsApp)</a></li>
                     <li>support@autopartslanka.lk</li>
                 </ul>
             </div>
