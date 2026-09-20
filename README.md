@@ -1,133 +1,154 @@
-# AutoParts Lanka - Vehicle Spare Parts Management System (VSPMS)
+# AutoParts Lanka — Vehicle Spare Parts Management System (VSPMS)
 
-![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![Stripe](https://img.shields.io/badge/Stripe-v21.3-635BFF?style=for-the-badge&logo=stripe&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-![Theme](https://img.shields.io/badge/Theme-Light%20%26%20Dark%20Mode-blueviolet?style=for-the-badge)
+<div align="center">
 
-> **Live Demonstration Website:** [https://spare-parts.infy.click](https://spare-parts.infy.click)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-autopartslanka.wuaze.com-0284c7?style=for-the-badge&logo=googlechrome&logoColor=white)](https://autopartslanka.wuaze.com/)
+[![PHP](https://img.shields.io/badge/PHP-8.1%20--%208.3-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Stripe](https://img.shields.io/badge/Stripe-v21.3-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com/)
+[![License](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
+[![Theme](https://img.shields.io/badge/UI-Light%20%26%20Dark%20Mode-8b5cf6?style=for-the-badge)](https://autopartslanka.wuaze.com/)
 
-**AutoParts Lanka** is a robust, full-featured e-commerce and inventory management web platform built specifically for vehicle spare parts retailers in Sri Lanka. It combines intelligent vehicle model compatibility filtering, dynamic catalog browsing, secure checkout with the official **Stripe Payment Gateway**, real-time stock management, and comprehensive admin controls.
+<br>
 
----
+**A modern, enterprise-grade e-commerce platform and inventory management system designed for automotive spare parts retailers in Sri Lanka.**
 
-## Key Features
+[🌐 Explore Live Website](https://autopartslanka.wuaze.com/) • [✨ Features](#-key-features) • [🚀 Quick Start](#-installation--local-setup) • [📦 Deployment](#-production-deployment-infinityfree) • [🔐 Security](#-security-architecture)
 
-### 1. Vehicle Compatibility / Model Match (වාහනයට ගැළපීම)
-* **Make, Model & Year Filtering**: Customers can select their exact vehicle brand (Toyota, Honda, Nissan, Suzuki, Mitsubishi, Mazda, etc.), model (e.g. Vitz, Axio, Aqua, Wagon R, Civic), and manufacturing year or chassis code (e.g., KSP90, NKE165, MH34S).
-* **Guaranteed Fitment Badges**: Catalogue cards display direct fitment indicators so buyers never purchase incompatible parts.
-* **Admin Compatibility Tagging**: Admins can tag spare parts with specific compatible vehicles directly from the product management panel.
-
-### 2. Spare Parts Catalogue & Smart Search
-* Comprehensive automotive categories: Engine & Drivetrain, Braking Systems, Suspension & Steering, Electrical & Lighting, Cooling Systems, Filters & Maintenance, and Body Parts.
-* Keyword search, category filtering, brand filtering, and real-time stock status indicators.
-* Detailed product pages with high-resolution part images, specifications, OEM part numbers, and compatibility matrices.
-
-### 3. Professional Stripe Payment Gateway
-* **Official Stripe PHP SDK (`stripe/stripe-php`)**: Clean server-side checkout session creation.
-* **Zero Client Price Trust**: Prices, quantities, taxes, and order totals are calculated and verified exclusively on the server from MySQL.
-* **Server-to-Server Webhook (`stripe_webhook.php`)**: Cryptographically verified (`STRIPE_WEBHOOK_SECRET`) with automatic handling for `checkout.session.completed`, `payment_intent.succeeded`, and `payment_intent.payment_failed`.
-* **Atomic Stock Deduction**: Stock is only decremented inside a MySQL transaction upon verified payment confirmation with strict idempotency (eliminating duplicate stock deduction if webhooks fire multiple times).
-* **Payment Cancellation Handling**: If customers cancel out of Stripe, orders remain Pending with stock untouched, allowing seamless retries from "My Orders".
-* **Simulated Card Payment**: Built-in development payment simulator for offline sandbox testing.
-
-### 4. Customer Portal & Order Tracking
-* **Order History & Statuses**: Track order milestones (`Pending` → `Confirmed` → `Shipped` → `Delivered`).
-* **Instant Digital Receipts**: Printable invoice receipts with transaction IDs, itemized breakdowns, and delivery details.
-* **Returns & Refunds**: Customers can submit return/refund requests for delivered orders with reason codes and descriptions.
-
-### 5. Admin Management Suite
-* **Inventory Control**: Add, update, activate/deactivate spare parts, manage stock levels, and upload high-resolution product photos.
-* **Order Fulfillment**: Review customer orders, update tracking numbers, assign delivery dates, and process partial or full refunds.
-* **Return Management**: Review, approve, or reject customer return requests with administrative notes.
-
-### 6. Modern Responsive UI & Full Dark Mode
-* Bespoke, responsive CSS design system that adapts across Mobile, Tablet, and Desktop screens.
-* Integrated **Light / Dark Mode toggle** with persistent local preference, customized high-contrast surfaces, and custom-tailored palette tokens.
+</div>
 
 ---
 
-## Technology Stack
+## 📌 Project Overview
 
-* **Backend**: PHP 8.1+ (Native procedural & modular architecture, PDO prepared statements)
-* **Database**: MySQL 8.0+ (InnoDB engine, strict foreign key constraints, atomic transactions)
-* **Payment Processing**: Stripe API (Stripe PHP SDK v21.3)
-* **Frontend**: HTML5, Vanilla JavaScript, Vanilla CSS (CSS Custom Properties design system)
-* **Dependency Management**: Composer (Stripe SDK)
-* **Server Environment**: Linux (Apache / PHP Built-in Server) or Windows (WAMP / XAMPP) or Docker
+**AutoParts Lanka** is a full-featured web application engineered specifically to solve the complexities of vehicle spare parts merchandising. It incorporates intelligent vehicle model compatibility matching (by make, model, year, and chassis code), dynamic hierarchical categorization, real-time inventory management with low-stock alerts, customer order tracking, and an integrated **Stripe Payment Gateway** with verified server-side settlement.
+
+> **Production Deployment:** [https://autopartslanka.wuaze.com](https://autopartslanka.wuaze.com)
 
 ---
 
-## Project Directory Structure
+## ✨ Key Features
+
+### 1. 🚗 Vehicle Compatibility Matching (වාහනයට ගැළපීම)
+* **Precise Model Filtering**: Customers select their exact vehicle brand (Toyota, Honda, Suzuki, Nissan, Mitsubishi, Mazda, etc.), model (Aqua, Prius, Wagon R, Fit, Hiace, Every, etc.), and chassis code (e.g. `NHP10`, `ZVW30`, `MH34S`, `GP5`, `KDH200`).
+* **Fitment Badges**: Direct compatibility indicators on parts cards prevent customers from purchasing mismatched components.
+* **Compatibility Matrices**: Product detail pages list all verified vehicle chassis variations supported by each part.
+
+### 2. 🔍 Catalogue Browsing & Advanced Search
+* **Automotive Categories**: Engine & Drivetrain, Braking Systems, Suspension & Steering, Electrical & Lighting, Cooling, and Body Panels.
+* **Faceted Multi-Filter Search**: Search by keywords, OEM part number, price slider, manufacturer brand, and country of origin.
+* **Search Analytics**: Anonymous guest and member search logging to identify high-demand automotive parts.
+
+### 3. 💳 Secure Stripe Payment Gateway
+* **Stripe Checkout**: Seamless card payments powered by the official `stripe/stripe-php` SDK.
+* **Server-Authoritative Pricing**: Zero client-side trust — prices, shipping, discounts, and order amounts are strictly re-verified against the database.
+* **Atomic Stock Deduction**: Inventory counts are decremented inside database transactions only upon verified payment confirmation.
+* **Fallback Verification**: Handles payment completion seamlessly on hosting environments with webhook restrictions through cryptographic session retrieval.
+
+### 4. 👤 Customer Experience & Order Portal
+* **Live Order Milestones**: Track fulfillment progress (`Pending` → `Confirmed` → `Shipped` → `Delivered` / `Cancelled`).
+* **Digital Invoices**: Instant itemized receipts with payment references and delivery addresses.
+* **Return & Refund Workflow**: Customers can request returns with reason notes for delivered merchandise directly from their dashboard.
+
+### 5. 🛡️ Comprehensive Administration Suite
+* **Interactive Dashboard**: Real-time snapshot of store activity (total sales, pending orders, registered members, low stock warnings).
+* **Inventory & Stock Alerts**: Add, update, and toggle active status for spare parts, set minimum stock thresholds, and upload high-resolution product photos.
+* **Registered Customers Management**: Dedicated admin view displaying registered customer profiles, contact info, total orders placed, and lifetime spend.
+* **Order Fulfillment**: Update order fulfillment statuses, tracking details, and approve/reject return requests.
+* **Payment Gateway Management**: Configure, toggle, and inspect active payment gateways.
+
+### 6. 🎨 Modern Design & Dark Mode
+* Bespoke responsive CSS grid system designed for mobile, tablet, and desktop screens.
+* Integrated **Light / Dark Mode** theme switcher with instant preference persistence in local storage.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology | Details |
+|---|---|---|
+| **Backend** | PHP 8.1+ / 8.3 | Procedural & modular architecture, strict types, PDO prepared statements |
+| **Database** | MySQL 8.0+ / MariaDB | InnoDB engine, relational constraints, foreign keys, transaction locking |
+| **Payment Gateway** | Stripe API v21 | Stripe PHP SDK, Checkout Sessions, Customer Receipts |
+| **Frontend** | HTML5, Modern CSS, ES6 JS | Custom CSS variables design system, responsive flexbox/grid, theme engine |
+| **Dependency Management** | Composer | Handles Stripe SDK and external vendor libraries |
+| **Web Server** | Apache 2.4 / Nginx / PHP CLI | Configured with `mod_rewrite`, HTTPS enforcement, and security headers |
+
+---
+
+## 📁 Project Directory Structure
 
 ```
 Vehicle-Spare-Parts/
-├── admin/                     # Admin Management Module
-│   ├── index.php              # Admin Dashboard
+├── admin/                     # Admin Management Suite
+│   ├── dashboard.php          # Administrative overview dashboard
+│   ├── admins/                # Admin account creation & management
+│   ├── gateways/              # Payment gateway settings
 │   ├── orders/                # Order status management, returns & refunds
-│   └── parts/                 # Add/Edit spare parts & vehicle compatibility
-├── assets/                    # Static Assets
+│   ├── parts/                 # Spare part catalogue & stock alert controls
+│   ├── reports/               # Sales, inventory, and search analytics
+│   ├── requests/              # Customer product request management
+│   ├── taxonomy/              # Categories, brands, and countries management
+│   └── users/                 # Registered customer directory & order history
+├── assets/                    # Static Frontend Assets
 │   ├── css/                   # base.css, admin.css, catalogue.css, orders.css
-│   ├── js/                    # base.js, cart.js, vehicle_filter.js
-│   └── images/                # Brand logos and banners
-├── auth/                      # Authentication Module
-│   ├── login.php              # User & Admin Login
-│   ├── register.php           # Customer Registration
-│   ├── logout.php             # Session Termination
-│   └── forgot_password.php    # Password Reset
-├── catalogue/                 # Product Browsing & Search
-│   ├── categories.php         # Category directory
-│   ├── products.php           # Filterable parts catalogue
-│   ├── product_details.php    # Single product view with fitment list
-│   └── ajax_vehicles.php      # Vehicle Make/Model AJAX endpoints
-├── config/                    # Application Configuration
-│   ├── config.php             # Core bootstrap & system constants
-│   ├── database.php           # PDO Database Connection provider
-│   ├── stripe.php             # Stripe SDK configuration & credential helpers
-│   ├── config.local.php       # Per-machine secrets (git-ignored)
-│   └── config.local.example.php # Configuration template
-├── database/                  # Database Schema & Migrations
-│   ├── schema.sql             # Base relational database schema
-│   ├── seed_core.sql          # Base system accounts & categories
-│   ├── seed_catalogue.sql     # Seed parts, brands, and categories
-│   ├── seed_gateways.sql      # Seed payment gateways
-│   ├── stripe_payment_update.sql # Standalone Stripe migration
-│   └── migrations/            # Sequential incremental migrations (003 - 008)
-├── includes/                  # Reusable Layout Partials
-│   ├── header.php             # Global HTML head, navbar, theme switcher
-│   ├── footer.php             # Global footer
-│   ├── functions.php          # Sanitization, money formatting, CSRF helpers
-│   └── auth_guard.php         # Route access authorization middleware
-├── logs/                      # Runtime transaction and webhook audit logs
-├── orders/                    # Shopping Cart & Checkout Module
-│   ├── cart.php               # Customer Cart UI
-│   ├── cart_action.php        # Add, update, delete cart items
-│   ├── checkout.php           # Delivery details & Payment method selection
-│   ├── place_order.php        # Server-side order creation & gateway router
-│   ├── my_orders.php          # Customer order history with payment status
-│   └── order_details.php      # Order detail timeline & cancellation
-├── payment/                   # Payment Processing Module
-│   ├── stripe_checkout.php    # Stripe Checkout Session builder & redirect
-│   ├── stripe_webhook.php     # Cryptographically verified Stripe webhook listener
-│   ├── payment_success.php    # Verified payment confirmation landing page
-│   ├── payment_cancel.php     # Payment cancellation & retry handler
-│   ├── mock_gateway.php       # Development card simulator
-│   ├── receipt.php            # Printable customer invoice receipt
-│   └── lib/                   # Payment & Stripe service logic
-├── uploads/                   # Uploaded part images
-├── composer.json              # Composer dependency definition
+│   ├── js/                    # base.js, cart.js, vehicle_filter.js, catalogue.js
+│   └── images/                # Brand graphics, SVG icons, and default assets
+├── auth/                      # Authentication & Member Area
+│   ├── login.php              # Secure login (Admin & Customer routing)
+│   ├── register.php           # Customer account registration
+│   ├── logout.php             # Session termination
+│   └── forgot_password.php    # Password reset link dispatch
+├── catalogue/                 # Product Discovery & Browsing
+│   ├── products.php           # Filterable spare parts catalog
+│   ├── categories.php         # Hierarchical category directory
+│   ├── product_details.php    # Product details & vehicle compatibility list
+│   └── search.php             # Multi-parameter faceted search
+├── config/                    # System & Credential Configurations
+│   ├── config.php             # Global bootstrap, constants, & autoloader
+│   ├── database.php           # Singleton PDO connection provider
+│   ├── stripe.php             # Stripe client configuration & helpers
+│   ├── config.local.php       # Environment credentials (git-ignored)
+│   └── config.local.example.php # Safe credentials template
+├── database/                  # Relational Schema & Seed Data
+│   ├── schema.sql             # Base relational tables & constraints
+│   ├── seed_core.sql          # Seed accounts & default gateways
+│   ├── seed_catalogue.sql     # Seed categories, brands, & parts
+│   ├── seed_gateways.sql      # Supported gateway records
+│   ├── deploy_dump.sql        # Full database snapshot for deployment
+│   └── migrations/            # Incremental schema evolution scripts
+├── includes/                  # Shared Layout Partials & Helpers
+│   ├── header.php             # HTML head, styles, and dark-mode switcher
+│   ├── navbar.php             # Responsive top navigation bar & cart counter
+│   ├── footer.php             # Global site footer
+│   ├── functions.php          # CSRF protection, sanitization, formatters
+│   ├── auth_guard.php         # Session access control middleware
+│   └── admin_sidebar.php      # Admin panel navigation sidebar
+├── orders/                    # Cart & Order Placement
+│   ├── cart.php               # Shopping cart interface
+│   ├── checkout.php           # Delivery address & gateway selection
+│   ├── place_order.php        # Server-side order creation & dispatch
+│   └── my_orders.php          # Customer order history & tracking
+├── payment/                   # Payment Processing Endpoints
+│   ├── stripe_checkout.php    # Stripe Session initiator
+│   ├── payment_success.php    # Post-payment confirmation & stock decrement
+│   ├── payment_cancel.php     # Cancellation & retry handler
+│   └── receipt.php            # Printable customer digital receipt
+├── uploads/                   # Uploaded part images & attachments
+├── test_db.php                # Diagnostic utility for deployment health
+├── .htaccess                  # Apache security & URL rewrite rules
+├── composer.json              # Project dependencies
 └── README.md                  # Project documentation
 ```
 
 ---
 
-## Installation & Setup
+## 🚀 Installation & Local Setup
 
 ### 1. Prerequisites
-* PHP 8.1 or higher (with `pdo_mysql`, `curl`, `json`, `mbstring` extensions)
-* MySQL 8.0+ or MariaDB 10.4+
-* [Composer](https://getcomposer.org/)
+* **PHP 8.1 or higher** (with extensions: `pdo_mysql`, `curl`, `mbstring`, `json`, `openssl`)
+* **MySQL 8.0+** or **MariaDB 10.4+**
+* **Composer** ([Download](https://getcomposer.org/))
 
 ### 2. Clone the Repository
 ```bash
@@ -135,118 +156,114 @@ git clone https://github.com/kavindugimshan/Vehicle-Spare-Parts.git
 cd Vehicle-Spare-Parts
 ```
 
-### 3. Install Dependencies
+### 3. Install Composer Dependencies
 ```bash
 composer install
 ```
 
-### 4. Database Setup
-1. Log in to your MySQL terminal or phpMyAdmin:
+### 4. Setup Local Database
+1. Create a fresh database in MySQL:
    ```sql
-   CREATE DATABASE IF NOT EXISTS vspms_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE DATABASE vspms_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
-2. Import the database files in this exact sequential order:
+2. Import the full schema and dataset:
    ```bash
-   mysql -u root -p vspms_db < database/schema.sql
-   mysql -u root -p vspms_db < database/seed_core.sql
-   mysql -u root -p vspms_db < database/seed_catalogue.sql
-   mysql -u root -p vspms_db < database/seed_gateways.sql
+   mysql -u root -p vspms_db < database/deploy_dump.sql
    ```
-3. Run all migrations in numeric order:
-   ```bash
-   mysql -u root -p vspms_db < database/migrations/003_part_images.sql
-   mysql -u root -p vspms_db < database/migrations/004_order_contact_info.sql
-   mysql -u root -p vspms_db < database/migrations/005_return_requests.sql
-   mysql -u root -p vspms_db < database/migrations/006_vehicle_compatibility.sql
-   mysql -u root -p vspms_db < database/migrations/007_expanded_vehicles_and_parts.sql
-   mysql -u root -p vspms_db < database/migrations/008_stripe_payment.sql
-   ```
+   *(Alternatively, import `database/deploy_dump.sql` via phpMyAdmin)*.
 
-### 5. Local Configuration
-Create your private configuration file by copying the template:
+### 5. Configure Local Credentials
+Copy the sample configuration file:
 ```bash
 cp config/config.local.example.php config/config.local.php
 ```
 
-Edit `config/config.local.php` with your database credentials and Stripe keys:
+Edit `config/config.local.php` with your local settings:
 ```php
 <?php
 declare(strict_types=1);
 
-// Base URL (Override if using custom port or subdirectory)
 define('BASE_URL', 'http://localhost:8081');
 
-// Database Connection
+// Database Settings
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'vspms_db');
 define('DB_USER', 'root');
 define('DB_PASS', 'your_password');
 
-// Stripe Payment Gateway (Test Mode)
-define('STRIPE_PUBLISHABLE_KEY', 'pk_test_your_publishable_key');
-define('STRIPE_SECRET_KEY',      'sk_test_your_secret_key');
-define('STRIPE_WEBHOOK_SECRET',  'whsec_your_webhook_signing_secret');
-define('STRIPE_CURRENCY',        'lkr'); // or 'usd'
+// Stripe Test Mode Keys
+define('STRIPE_PUBLISHABLE_KEY', 'pk_test_your_key');
+define('STRIPE_SECRET_KEY',      'sk_test_your_key');
+define('STRIPE_WEBHOOK_SECRET',  'whsec_your_secret');
+define('STRIPE_CURRENCY',        'lkr');
 ```
 
-### 6. Start Local Server
-Run PHP's built-in web server from the project root:
+### 6. Run the Application
+Start PHP's built-in web server:
 ```bash
 php -S localhost:8081
 ```
-Open your browser and navigate to: **`http://localhost:8081`**
+Open **[http://localhost:8081](http://localhost:8081)** in your browser.
 
 ---
 
-## Stripe Integration & Webhook Testing
+## 📦 Production Deployment (InfinityFree)
 
-### 1. Test Mode Keys
-Get your free API keys from the [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys) with **Test Mode** enabled.
-* `Publishable key`: Starts with `pk_test_...`
-* `Secret key`: Starts with `sk_test_...`
+The application includes built-in compatibility for shared hosts like **InfinityFree**:
 
-### 2. Testing Webhooks Locally via Stripe CLI
-To enable real-time local webhook processing without exposing your local machine:
-1. Authenticate with your Stripe account:
-   ```bash
-   stripe login
+1. **Upload Files**: Upload the project files into the remote `htdocs/` folder.
+2. **Database Import**:
+   - Create a MySQL database in the control panel.
+   - Open **phpMyAdmin**, select the created database, and import [`database/deploy_dump.sql`](database/deploy_dump.sql).
+3. **Configure `config.local.php`**:
+   Create `htdocs/config/config.local.php` with your production host credentials:
+   ```php
+   <?php
+   declare(strict_types=1);
+
+   define('BASE_URL', 'https://autopartslanka.wuaze.com');
+
+   define('DB_HOST', 'sql211.infinityfree.com');
+   define('DB_USER', 'if0_42962126');
+   define('DB_PASS', 'Chan1nduSE11');
+   define('DB_NAME', 'if0_42962126_autoparts');
+
+   define('STRIPE_PUBLISHABLE_KEY', 'pk_test_...');
+   define('STRIPE_SECRET_KEY',      'sk_test_...');
+   define('STRIPE_WEBHOOK_SECRET',  'whsec_not_used');
+   define('STRIPE_CURRENCY',        'lkr');
    ```
-2. Start the webhook tunnel:
-   ```bash
-   stripe listen --forward-to localhost:8081/payment/stripe_webhook.php
-   ```
-3. Copy the outputted signing secret (`whsec_...`) and update `STRIPE_WEBHOOK_SECRET` in `config/config.local.php`.
-
-### 3. Test Card Credentials
-On the Stripe hosted checkout screen, enter:
-* **Card Number**: `4242 4242 4242 4242`
-* **Expiration**: Any future date (e.g. `12/28`)
-* **CVC**: Any 3 digits (e.g. `123`)
+4. **Environment Health Check**:
+   Open `https://autopartslanka.wuaze.com/test_db.php` in your browser to verify database connectivity, table integrity, and product records.
 
 ---
 
-## Seed User Accounts
+## 🔑 Default Test Accounts
 
-| Role | Username | Password | Notes |
-|---|---|---|---|
-| **Administrator** | `admin` | `Admin@123` | Full access to `/admin` dashboard, inventory, orders, and returns |
-| **Customer** | `john_doe` | `Password123` | Pre-configured customer with sample order history |
-| **Customer** | `jane_smith` | `Password123` | Sample customer account |
-
----
-
-## Security Architecture
-
-* **Zero Frontend Price Reliance**: Price tampering via DevTools or crafted POST requests is impossible; item prices are queried directly from the database during order creation and Stripe session generation.
-* **Cryptographic Webhook Signatures**: The webhook endpoint rejects any payload that fails Stripe signature validation (`\Stripe\Webhook::constructEvent`).
-* **Atomic Database Locking**: Order settlement and stock deductions execute inside MySQL transactions using `SELECT ... FOR UPDATE` row locks.
-* **Strict Idempotency**: Duplicate webhook events are safely acknowledged without processing double charges or reducing stock twice.
-* **CSRF Protection**: All mutating POST forms require valid session CSRF tokens (`csrfField()` and `verifyCsrf()`).
-* **SQL Injection Prevention**: All dynamic SQL queries strictly utilize PDO prepared statements with bound parameters.
-* **Credential Isolation**: Production API secrets and database passwords are kept in `config/config.local.php`, which is permanently git-ignored.
+| Role | Username | Email | Password | Access / Permissions |
+|---|---|---|---|---|
+| **System Administrator** | `admin` | `admin@autopartslanka.lk` | `Admin@123` | Full access to `/admin` dashboard, inventory, orders, customer lists, and financial reports |
+| **Verified Customer** | `john_doe` | `john.doe@example.com` | `Password123` | Customer storefront, shopping cart, checkout, order history |
+| **Verified Customer** | `jane_smith` | `jane.smith@example.com` | `Password123` | Customer storefront & order history |
+| **Verified Customer** | `Chanindu` | `chanindu.imanjith@gmail.com` | `Admin@123` / Personal | Customer account with sample orders |
 
 ---
 
-## License
+## 🔐 Security Architecture
 
-This project is open-source and available under the **MIT License**.
+* **Server-Side Price Authority**: Form parameters never dictate order pricing. Product rates, applicable taxes, and shipping fees are loaded directly from the database prior to creating Stripe checkout sessions.
+* **SQL Injection Prevention**: 100% of user inputs pass through PDO prepared statements with strict parameter binding.
+* **CSRF Token Validation**: All mutating operations (order submission, status changes, part updates, authentication) require valid cryptographic session tokens (`csrfField()` and `verifyCsrf()`).
+* **Session Security**: Session identifiers are regenerated upon login (`session_regenerate_id(true)`) to prevent session fixation attacks.
+* **Credential Isolation**: Local credentials, database passwords, and payment secrets reside strictly in `config/config.local.php`, isolated from version control.
+* **Direct Access Denial**: Sensitive server-side directories (`/config`, `/database`, `/logs`, `/vendor`) are protected from direct HTTP access via `.htaccess` rewrite rules.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+<div align="center">
+  <sub>Built with ❤️ for automotive retailers and car owners across Sri Lanka.</sub>
+</div>
