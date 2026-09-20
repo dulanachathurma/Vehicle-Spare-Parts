@@ -1,0 +1,75 @@
+# ============================================================================
+# AutoParts Lanka — Root .htaccess
+# Target: InfinityFree (Apache 2.4, mod_rewrite enabled)
+#
+# Rules:
+#   1. HTTPS redirect (where supported)
+#   2. Disable directory listing
+#   3. Block direct web access to sensitive directories
+#   4. Allow all payment/*.php, assets/, uploads/parts/, CSS/JS/images
+# ============================================================================
+
+# ── Directory listing ────────────────────────────────────────────────────────
+Options -Indexes
+
+# ── HTTPS redirect ───────────────────────────────────────────────────────────
+# InfinityFree supports HTTPS. Redirect all HTTP → HTTPS.
+# Uses mod_rewrite rather than HSTS headers for broadest server compatibility.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Force HTTPS (skip if already HTTPS or if running on localhost)
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^localhost [NC]
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ── Block direct web access to sensitive directories ─────────────────────────
+# /config   — database credentials, Stripe keys
+# /database — SQL schema and seed files
+# /logs     — server-side error/webhook logs
+# /vendor   — Composer autoloader (PHP only, no web access needed)
+# /docker   — Docker configuration files
+# /docs     — internal project documentation
+
+<IfModule mod_rewrite.c>
+    RewriteRule ^(config|database|logs|vendor|docker|docs)(/|$) - [F,L,NC]
+</IfModule>
+
+# Block hidden files (.git, .env, etc.) — defence in depth
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# ── Explicitly allow payment pages ───────────────────────────────────────────
+# These must remain publicly accessible. Deny rules above are directory-level
+# and do not affect /payment/ (which is intentionally public).
+# /payment/pay.php
+# /payment/payment_success.php
+# /payment/payment_cancel.php
+# /payment/stripe_webhook.php  (kept for future hosting — InfinityFree won't call it)
+# /payment/receipt.php
+
+# ── Security headers ─────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header set X-Content-Type-Options "nosniff"
+    # Basic clickjacking protection
+    Header set X-Frame-Options "SAMEORIGIN"
+    # Referrer policy
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ── PHP settings (InfinityFree allows these) ─────────────────────────────────
+<IfModule mod_php8.c>
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log logs/php_errors.log
+</IfModule>
