@@ -2,6 +2,8 @@
 
 # Per-machine credentials - never commit real DB/gateway secrets.
 /config/config.local.php
+/config/config.server.php
+/config/config.production.php
 
 # Uploaded part images
 /uploads/parts/*
@@ -14,9 +16,13 @@
 /logs/*
 !/logs/.gitkeep
 
+# Deployment DB dump — contains real data, never commit
+/database/deploy_dump.sql
+
 # Editor/OS noise
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 /vendor/
+/autoparts_deploy.zip
