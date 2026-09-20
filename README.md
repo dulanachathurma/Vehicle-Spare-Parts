@@ -29,7 +29,7 @@
 
 ## ✨ Key Features
 
-### 1. 🚗 Vehicle Compatibility Matching (වාහනයට ගැළපීම)
+### 1. 🚗 Vehicle Compatibility Matching 
 * **Precise Model Filtering**: Customers select their exact vehicle brand (Toyota, Honda, Suzuki, Nissan, Mitsubishi, Mazda, etc.), model (Aqua, Prius, Wagon R, Fit, Hiace, Every, etc.), and chassis code (e.g. `NHP10`, `ZVW30`, `MH34S`, `GP5`, `KDH200`).
 * **Fitment Badges**: Direct compatibility indicators on parts cards prevent customers from purchasing mismatched components.
 * **Compatibility Matrices**: Product detail pages list all verified vehicle chassis variations supported by each part.
