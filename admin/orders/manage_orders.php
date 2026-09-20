@@ -18,12 +18,16 @@ $sql = 'SELECT o.*, u.username, u.email, p.status AS paymentStatus, g.gatewayNam
         LEFT JOIN payment p ON p.orderID = o.orderID
         LEFT JOIN payment_gateway g ON g.gatewayID = p.gatewayID
         WHERE 1=1';
-$params = [];
+$userIdFilter = isset($_GET['user_id']) && $_GET['user_id'] !== '' ? (int) $_GET['user_id'] : null;
 if (in_array($statusFilter, $validStatuses, true)) {
     $sql .= ' AND o.status = ?';
     $params[] = $statusFilter;
 }
-$sql .= ' ORDER BY o.orderDate DESC';
+if ($userIdFilter) {
+    $sql .= ' AND o.userID = ?';
+    $params[] = $userIdFilter;
+}
+$sql .= ' ORDER BY o.orderDate DESC, o.orderID DESC';
 
 $stmt = $db->prepare($sql);
 $stmt->execute($params);
