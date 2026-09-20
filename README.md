@@ -257,8 +257,23 @@ The application includes built-in compatibility for shared hosts like **Infinity
 * **Session Security**: Session identifiers are regenerated upon login (`session_regenerate_id(true)`) to prevent session fixation attacks.
 * **Credential Isolation**: Local credentials, database passwords, and payment secrets reside strictly in `config/config.local.php`, isolated from version control.
 * **Direct Access Denial**: Sensitive server-side directories (`/config`, `/database`, `/logs`, `/vendor`) are protected from direct HTTP access via `.htaccess` rewrite rules.
-
 ---
+
+## 🧪 Testing Payments (Stripe Test Mode)
+
+To test the Stripe checkout flow without real money, use the following **Stripe test card** details on the payment page:
+
+| Field | Value |
+|-------|-------|
+| **Card Number** | `4242 4242 4242 4242` |
+| **Expiry Date** | `12/28` |
+| **CVC** | `123` |
+| **Name** | Any name (e.g. `Test User`) |
+
+> [!NOTE]
+> These are **Stripe sandbox credentials** — no real money is charged. A successful test payment will trigger order creation and show the order confirmation page.
+
+For a full list of Stripe test cards (declined, 3D Secure, etc.), visit the [Stripe Testing Docs](https://stripe.com/docs/testing).
 
 ## 📄 License
 
