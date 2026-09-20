@@ -3,11 +3,38 @@
 declare(strict_types=1);
 
 /**
- * payment/stripe_webhook.php - Stripe Webhook Endpoint.
+ * payment/stripe_webhook.php — Stripe Webhook Endpoint.
  *
  * Authoritative, server-to-server payment verification with cryptographic
  * signature validation. Handles successful checkouts, payments, failures,
  * and refunds idempotently inside MySQL transactions with atomic stock updates.
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ * IMPORTANT — InfinityFree Free Hosting Limitation
+ * ═══════════════════════════════════════════════════════════════════════════
+ * InfinityFree blocks server-to-server incoming HTTP requests from third
+ * parties (including Stripe's webhook delivery servers). This means Stripe
+ * CANNOT reliably reach this endpoint on InfinityFree hosting.
+ *
+ * For the free-hosting demo at autopartslanka.wuaze.com, payment
+ * confirmation is handled instead via browser-return verification in:
+ *   payment/payment_success.php
+ *
+ * That page retrieves the Checkout Session directly from the Stripe API
+ * (server-side, using your secret key) and verifies payment_status, metadata,
+ * currency, and amount before calling confirmStripePayment().
+ *
+ * This file is retained in the project so that upgrading to proper hosting
+ * (VPS, shared cPanel, AWS, etc.) only requires registering this endpoint
+ * URL in the Stripe Dashboard — no code changes needed.
+ *
+ * To enable webhooks on capable hosting:
+ *   1. Register: https://dashboard.stripe.com/test/webhooks
+ *   2. Endpoint URL: https://yourdomain.com/payment/stripe_webhook.php
+ *   3. Events: checkout.session.completed, payment_intent.succeeded,
+ *              payment_intent.payment_failed, charge.refunded
+ *   4. Copy the signing secret to STRIPE_WEBHOOK_SECRET in config.local.php
+ * ═══════════════════════════════════════════════════════════════════════════
  */
 
 require_once __DIR__ . '/../config/config.php';
