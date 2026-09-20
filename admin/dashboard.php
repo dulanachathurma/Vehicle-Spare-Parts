@@ -33,7 +33,7 @@ $cards = [
     [
         'label' => 'Registered Users',
         'value' => $totalUsers,
-        'link' => BASE_URL . '/admin/reports/sales_report.php',
+        'link' => BASE_URL . '/admin/users/list_users.php',
         'tone' => 'success',
     ],
     [

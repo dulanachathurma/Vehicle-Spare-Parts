@@ -48,6 +48,7 @@ function admNavActive(string $path, string $currentScript): string
         <a class="adm-nav-link<?php echo admNavActive('manage_requests.php', $currentScript); ?>" href="<?php echo BASE_URL; ?>/admin/requests/manage_requests.php">Product Requests</a>
 
         <p class="adm-nav-heading">Administration</p>
+        <a class="adm-nav-link<?php echo admNavActive('list_users.php', $currentScript); ?>" href="<?php echo BASE_URL; ?>/admin/users/list_users.php">Registered Users</a>
         <a class="adm-nav-link<?php echo admNavActive('list_admins.php', $currentScript); ?>" href="<?php echo BASE_URL; ?>/admin/admins/list_admins.php">Admin Accounts</a>
 
         <p class="adm-nav-heading">Reports</p>
