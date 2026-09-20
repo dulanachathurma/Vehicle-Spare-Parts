@@ -246,7 +246,7 @@ The application includes built-in compatibility for shared hosts like **Infinity
 | **Verified Customer** | `john_doe` | `john.doe@example.com` | `Password123` | Customer storefront, shopping cart, checkout, order history |
 | **Verified Customer** | `jane_smith` | `jane.smith@example.com` | `Password123` | Customer storefront & order history |
 | **Verified Customer** | `Chanindu` | `chanindu.imanjith@gmail.com` | `12345678` / Personal | Customer account with sample orders |
-| **Verified Customer** | `Dulana` | `dulanachathurma99@gmail.com` | `Admin@123` / Personal | Customer account with sample orders |
+| **Verified Customer** | `Dulana` | `dulanachathurma99@gmail.com` | `dula@123` / Personal | Customer account with sample orders |
 ---
 
 ## 🔐 Security Architecture
