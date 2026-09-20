@@ -18,18 +18,24 @@ if (session_status() === PHP_SESSION_NONE) {
 
 date_default_timezone_set('Asia/Colombo');
 
-// Load per-machine config first so it can override BASE_URL
+// Load per-machine credentials.
+// Both local development and production (InfinityFree) use config.local.php.
+// That file is git-ignored; copy config.local.example.php to create it.
 $localConfig = __DIR__ . '/config.local.php';
 if (file_exists($localConfig)) {
     require_once $localConfig;
 } else {
-    // No per-machine file yet - fall back to the placeholder template so
+    // No per-machine file yet — fall back to the placeholder template so
     // the app still boots (with a non-functional DB connection) rather
     // than fatal-erroring on a fresh checkout.
     require_once __DIR__ . '/config.local.example.php';
 }
 
-if (!defined('BASE_URL'))     define('BASE_URL', 'http://localhost/vehicle-spare-parts');
+if (!defined('BASE_URL')) {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost/vehicle-spare-parts';
+    define('BASE_URL', $scheme . '://' . $host);
+}
 define('SITE_NAME', 'AutoParts Lanka');
 define('CURRENCY', 'Rs');
 define('PRICE_RANGE_PERCENT', 15);
