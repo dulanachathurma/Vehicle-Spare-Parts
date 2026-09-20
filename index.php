@@ -301,7 +301,7 @@ require __DIR__ . '/includes/header.php';
             </span>
             <div class="home-feature-info">
                 <h4 class="home-feature-title">Direct Support</h4>
-                <p class="home-feature-desc">+94 70 358 7028 (WhatsApp)</p>
+                <p class="home-feature-desc">WhatsApp</p>
             </div>
         </a>
     </div>
