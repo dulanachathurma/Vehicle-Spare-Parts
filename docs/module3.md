@@ -320,3 +320,51 @@ Comprehensive test coverage for Module 3 covering cart, checkout, payment and ca
 
 
 
+---
+
+## Payment Gateway Integration Flow
+
+Module 3 integrates two payment gateways. The following diagram shows how payment flows through each path, and how both converge back to order confirmation.
+
+```mermaid
+flowchart TD
+    A([Customer at Checkout]) --> B{Select Payment Gateway}
+    B -->|PayHere Sandbox| C[payhere_checkout.php\nBuilds signed HTML form\nwith MD5 hash]
+    B -->|Simulated Card| D[mock_gateway.php\nShows fake card form]
+
+    C --> E[(PayHere Sandbox Server\nhttps://sandbox.payhere.lk)]
+    E -->|return_url — browser redirect| F[payment_return.php]
+    E -->|notify_url — server POST| G[payhere_notify.php\nVerifies hash, updates DB\nNot reachable on localhost]
+
+    D -->|Success checkbox unchecked| F
+    D -->|Simulate Failed clicked| H[payment_cancel.php\nSets payment status = Failed]
+
+    F --> I{Payment Valid?}
+    I -->|Yes| J[Update payment → Success\nUpdate order → Confirmed]
+    I -->|No| H
+
+    J --> K([order_confirmation.php])
+    H --> L([my_orders.php — Retry Link])
+
+    style E fill:#f4a261,color:#000
+    style G fill:#e9c46a,color:#000
+    style J fill:#2a9d8f,color:#fff
+    style H fill:#e76f51,color:#fff
+```
+
+### PayHere MD5 Hash Generation
+
+The PayHere integration requires a cryptographic signature to prevent request tampering. The hash is computed as:
+
+```
+hash = strtoupper( MD5(
+    merchant_id +
+    order_id +
+    number_format(amount, 2, '.', '') +
+    currency +
+    strtoupper(MD5(merchant_secret))
+) )
+```
+
+> **Security Note:** The `merchant_secret` is only stored in `config/config.local.php` which is git-ignored. It is never transmitted in the form or stored in the database. The `notify_url` callback from PayHere's servers also re-verifies this hash before updating any order record.
+
