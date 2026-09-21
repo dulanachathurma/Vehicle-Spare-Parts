@@ -231,4 +231,38 @@ sequenceDiagram
     Handler-->>Gateway: Redirect to payment/pay.php?order_id={orderID}
 ```
 
+---
+
+## Order & Payment Lifecycle State Machines
+
+Orders and payment records transition through well-defined lifecycle states.
+
+### Order Status Transitions
+
+```mermaid
+stateDiagram-v2
+    [*] --> Pending: Order Placed (Stock Reserved)
+    Pending --> Confirmed: Payment Verified (Success)
+    Pending --> Cancelled: Cancelled / Payment Expired (Stock Restored)
+    Confirmed --> Processing: Admin Accepts & Packs Order
+    Confirmed --> Cancelled: Customer/Admin Cancels (Stock Restored, Refunded)
+    Processing --> Shipped: Tracking Number Added
+    Shipped --> Delivered: Package Handed Over
+    Processing --> Cancelled: Admin Exception Only (Stock Restored, Refunded)
+    Delivered --> [*]
+    Cancelled --> [*]
+```
+
+### Order Cancellation & Action Matrix
+
+| Current Order Status | Customer Can Cancel? | Admin Can Cancel? | Stock Impact | Payment Impact |
+|---|---|---|---|---|
+| `Pending` | **Yes** (`cancel_order.php`) | **Yes** (`update_order_status.php`) | Automatically restored (+qty) | Status set to `Failed` / `Cancelled` |
+| `Confirmed` | **Yes** (`cancel_order.php`) | **Yes** (`update_order_status.php`) | Automatically restored (+qty) | Status updated to `Refunded` |
+| `Processing` | **No** (Locked) | **Yes** (With justification) | Restored if admin initiates | Processed via `process_refund.php` |
+| `Shipped` | **No** (In transit) | **No** (Requires return flow) | None | None |
+| `Delivered` | **No** (Completed) | **No** (Final state) | None | None |
+| `Cancelled` | **No** (Final state) | **No** (Final state) | None | None |
+
+
 
