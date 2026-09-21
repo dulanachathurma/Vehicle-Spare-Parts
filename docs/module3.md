@@ -190,3 +190,45 @@ erDiagram
 - **Cart Persistence**: `CART` and `CART_ITEM` survive logout and reconnect automatically when a verified customer logs back in.
 - **Atomic Foreign Keys**: Deleting or archiving parts does not orphan historical `ORDER_ITEM` records due to restricted delete foreign key rules.
 
+---
+
+## Transactional Order Placement Sequence
+
+The order checkout workflow is strictly guarded by an ACID database transaction to prevent inventory overselling and inconsistent financial states.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Customer
+    participant Checkout as orders/checkout.php
+    participant Handler as orders/place_order.php
+    participant Helper as order_helper::placeOrder()
+    participant DB as MySQL Database
+    participant Gateway as payment/pay.php
+
+    Customer->>Checkout: Submits Checkout Form (Address, Gateway)
+    Checkout->>Handler: POST with CSRF token & shipping data
+    Handler->>Helper: Invoke placeOrder($userID, $data)
+    Helper->>DB: PDO beginTransaction()
+    
+    loop For each Cart Item
+        Helper->>DB: SELECT stockQty, unitPrice FROM spare_part WHERE partID = ? FOR UPDATE
+        alt Stock Insufficient (stockQty < requestedQty)
+            Helper->>DB: PDO rollBack()
+            Helper-->>Handler: Return error: "Item out of stock"
+            Handler-->>Customer: Redirect to Cart with alert
+        else Stock Available
+            Helper->>DB: UPDATE spare_part SET stockQty = stockQty - ? WHERE partID = ? AND stockQty >= ?
+        end
+    end
+
+    Helper->>DB: INSERT INTO orders (userID, subtotal, taxAmount, totalAmount, status, ...)
+    Helper->>DB: INSERT INTO order_item (orderID, partID, quantity, unitPrice) [snapshots]
+    Helper->>DB: DELETE FROM cart_item WHERE cartID = ? [empty cart]
+    Helper->>DB: INSERT INTO payment (orderID, gatewayID, amount, status = 'Pending')
+    Helper->>DB: PDO commit()
+    Helper-->>Handler: Return orderID
+    Handler-->>Gateway: Redirect to payment/pay.php?order_id={orderID}
+```
+
+
