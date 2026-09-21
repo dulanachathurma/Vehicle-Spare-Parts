@@ -481,7 +481,30 @@ The following risks and assumptions were identified and mitigated during develop
 - `csrfField()` and `verifyCsrf()` are provided by Module 1's `includes/functions.php`; Module 3 calls them but does not implement them.
 - The frozen navbar in Module 1 already contains a `function_exists('cartItemCount')` guard, so the cart badge degrades gracefully on pages that do not load `order_helper.php`.
 
+#### Module 3 — Inter-Module API Contract
+
+Module 3 consumes the following interfaces provided by other modules. These are contracts — **Module 3 must not redefine or re-implement these functions**.
+
+| Function / File | Provided By | Used In | Purpose |
+|---|---|---|---|
+| `auth_guard.php` | Module 1 | Every page in `orders/` and `payment/` | Enforces customer login; redirects guests to `/auth/login.php` |
+| `csrfField()` | Module 1 — `includes/functions.php` | `orders/checkout.php`, `orders/cancel_order.php` | Renders a hidden CSRF token input |
+| `verifyCsrf()` | Module 1 — `includes/functions.php` | `orders/place_order.php`, `orders/cancel_order.php` | Validates the CSRF token; aborts on mismatch |
+| `TAX_RATE` constant | Module 1 — `config/config.php` | `orders/lib/order_helper.php` | Tax multiplier applied to order subtotal |
+| `DB_HOST`, `DB_NAME`, etc. | Module 1 — `config/config.php` | `config/database.php` | Database connection credentials |
+| `getDB()` / PDO connection | Module 1 — `config/database.php` | `order_helper.php`, `payment_helper.php` | Returns shared PDO connection |
+| `includes/navbar.php` (frozen) | Module 1 | All customer-facing order pages | Site navigation; calls `cartItemCount()` through guard |
+| `includes/footer.php` (frozen) | Module 1 | All customer-facing order pages | Site footer |
+| `product_details.php` | Module 2 | `orders/cart_action.php` (linked from) | Add-to-Cart button source; Module 3 only receives the POST |
+
+Module 3 **exports** the following to be consumed by other modules:
+
+| Function | Exported From | Consumed By | Purpose |
+|---|---|---|---|
+| `cartItemCount($userID)` | `orders/lib/order_helper.php` | Module 1 — `includes/navbar.php` | Returns cart item count for the navbar badge |
+
 ### MODULE 4 — Inventory Administration, Product Requests & DevOps
+
 
 **Owner: Chanindu Imanjith (SE/2023/022)**
 
