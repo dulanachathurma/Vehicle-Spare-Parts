@@ -461,7 +461,28 @@ If `affected_rows` returns 0, the transaction is rolled back immediately. This e
 ---
 
 
+#### Module 3 — Risk Register & Assumptions
+
+The following risks and assumptions were identified and mitigated during development of Module 3.
+
+| # | Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|---|
+| R1 | Concurrent checkout depletes stock below zero | Medium | High | Atomic guarded `UPDATE ... WHERE stockQty >= ?` with transaction rollback |
+| R2 | PayHere sandbox unavailable during presentation | Low | High | Simulated gateway (`mock_gateway.php`) requires no internet and no credentials |
+| R3 | Price manipulation via POST tampering | Low | High | All prices re-read from database inside the transaction; POST prices discarded |
+| R4 | CSRF replay attack on order placement | Low | High | One-time CSRF token validated by `verifyCsrf()` before any DB write |
+| R5 | `notify_url` unreachable on localhost | High | Low | Documented workaround using `return_url` on WAMP; `ngrok` for live testing |
+| R6 | Cart orphaned after account deletion | Low | Medium | Foreign key `ON DELETE CASCADE` on `cart.userID` cleans up automatically |
+| R7 | Duplicate gateway rows in `seed_gateways.sql` | Low | Low | `INSERT ... WHERE NOT EXISTS` guard prevents duplicates regardless of import order |
+
+**Assumptions made during Module 3 development:**
+- `TAX_RATE` is defined as a constant in `config/config.php` (Module 1); Module 3 reads it directly without redefining it.
+- `auth_guard.php` is provided by Module 1 and handles all redirect-to-login behaviour; Module 3 simply includes it at the top of every customer-facing page.
+- `csrfField()` and `verifyCsrf()` are provided by Module 1's `includes/functions.php`; Module 3 calls them but does not implement them.
+- The frozen navbar in Module 1 already contains a `function_exists('cartItemCount')` guard, so the cart badge degrades gracefully on pages that do not load `order_helper.php`.
+
 ### MODULE 4 — Inventory Administration, Product Requests & DevOps
+
 **Owner: Chanindu Imanjith (SE/2023/022)**
 
 **Responsible for:** everything the admin uses to maintain the catalogue, plus the full out-of-stock request workflow on both the customer and admin side.
