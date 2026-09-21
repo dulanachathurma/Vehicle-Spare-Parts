@@ -264,5 +264,59 @@ stateDiagram-v2
 | `Delivered` | **No** (Completed) | **No** (Final state) | None | None |
 | `Cancelled` | **No** (Final state) | **No** (Final state) | None | None |
 
+---
+
+## Test Case Matrix
+
+Comprehensive test coverage for Module 3 covering cart, checkout, payment and cancellation edge cases.
+
+### Cart Functionality Tests
+
+| ID | Test Scenario | Input / Action | Expected Outcome | Status |
+|---|---|---|---|---|
+| TC-C01 | Add new item to cart | Click "Add to Cart" on a part with stock | Item appears in cart, quantity = 1 | ✅ Pass |
+| TC-C02 | Add same item again | Click "Add to Cart" a second time on same part | Existing cart row qty incremented (no duplicate row) | ✅ Pass |
+| TC-C03 | Update quantity in cart | Set quantity to valid number ≤ stockQty | Quantity updated, totals recalculated | ✅ Pass |
+| TC-C04 | Exceed stock quantity | Set qty > available stockQty | Validation error shown, qty not updated | ✅ Pass |
+| TC-C05 | Remove item from cart | Click Remove on a cart row | Item deleted from `cart_item`, totals updated | ✅ Pass |
+| TC-C06 | Clear entire cart | Click "Clear Cart" button | All `cart_item` rows for session deleted | ✅ Pass |
+| TC-C07 | Guest adds to cart | Unauthenticated user clicks Add to Cart | Redirected to login page | ✅ Pass |
+| TC-C08 | Cart survives logout | Add item, log out, log back in | Cart items still present | ✅ Pass |
+| TC-C09 | Cart badge count | Navigate any page with items in cart | Navbar badge shows correct count | ✅ Pass |
+
+### Checkout & Order Placement Tests
+
+| ID | Test Scenario | Input / Action | Expected Outcome | Status |
+|---|---|---|---|---|
+| TC-O01 | Successful order placement | Confirm checkout with stock available | Order created, stock decremented, cart emptied, payment `Pending` | ✅ Pass |
+| TC-O02 | Race condition — last unit | Two sessions both checkout same last item simultaneously | One succeeds; other gets rollback with out-of-stock error | ✅ Pass |
+| TC-O03 | Tax calculation accuracy | Checkout with known item prices | Subtotal + (subtotal × TAX_RATE) = Total | ✅ Pass |
+| TC-O04 | CSRF token validation | Tamper with or omit CSRF token on checkout POST | Request rejected with 403 | ✅ Pass |
+| TC-O05 | Empty cart checkout | Navigate to checkout with empty cart | Redirected back to cart with a warning | ✅ Pass |
+| TC-O06 | Price tamper attempt | Manipulate POST amount via DevTools | Server ignores POST prices; uses database price | ✅ Pass |
+| TC-O07 | Shipping address pre-fill | Log in and load checkout | Shipping address pre-filled from user profile | ✅ Pass |
+| TC-O08 | Override shipping address | Type a new address in the checkout form | Order saved with new address | ✅ Pass |
+
+### Payment Gateway Tests
+
+| ID | Test Scenario | Input / Action | Expected Outcome | Status |
+|---|---|---|---|---|
+| TC-P01 | Simulated success | Mock gateway: submit without "Fail" checkbox | Payment `Success`, order `Confirmed` | ✅ Pass |
+| TC-P02 | Simulated failure | Mock gateway: tick "Simulate failed payment" | Payment `Failed`, order stays `Pending` | ✅ Pass |
+| TC-P03 | Retry payment | From `my_orders.php` on Pending order, retry link | Navigates back to `payment/pay.php` to retry | ✅ Pass |
+| TC-P04 | Disabled gateway hides in checkout | Admin disables a gateway in `manage_gateways.php` | Gateway no longer appears in checkout radio list | ✅ Pass |
+| TC-P05 | Receipt generation | Complete a successful order | `receipt.php` shows full itemised receipt with shop details | ✅ Pass |
+
+### Order Cancellation Tests
+
+| ID | Test Scenario | Input / Action | Expected Outcome | Status |
+|---|---|---|---|---|
+| TC-X01 | Customer cancels Pending order | Cancel from `order_details.php` | Status → Cancelled, stock restored, payment → Refunded | ✅ Pass |
+| TC-X02 | Customer cancels Confirmed order | Cancel from `order_details.php` | Status → Cancelled, stock restored, payment → Refunded | ✅ Pass |
+| TC-X03 | Customer cannot cancel Shipped order | Attempt cancel on Shipped order | Cancel button hidden/disabled | ✅ Pass |
+| TC-X04 | Admin cancels any active order | Admin changes status to Cancelled | Stock restored via `restoreStockForOrder()`, payment updated | ✅ Pass |
+| TC-X05 | Stock restoration integrity | Cancel multi-item order | Each part's `stockQty` individually and correctly restored | ✅ Pass |
+
+
 
 
