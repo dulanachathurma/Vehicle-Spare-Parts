@@ -414,4 +414,100 @@ ngrok http 80
 
 Then set the `notify_url` in `payhere_checkout.php` to the ngrok HTTPS URL (e.g., `https://abc123.ngrok.io/vehicle-spare-parts/payment/payhere_notify.php`). PayHere's servers can then reach the local machine and the server-to-server hash verification can be tested end-to-end.
 
+---
+
+## Overall Module 3 Data Flow
+
+This diagram shows the complete data journey from user input through the application layers to the database for the core order placement flow.
+
+```mermaid
+flowchart TD
+    subgraph INPUT["👤 User Input Layer"]
+        A1["Add to Cart click\n(product_details.php)"]
+        A2["Checkout form submit\n(checkout.php)"]
+        A3["Payment gateway submit\n(mock_gateway / PayHere)"]
+    end
+
+    subgraph LOGIC["⚙️ Business Logic Layer"]
+        B1["cart_action.php\nValidates partID & qty\nChecks stockQty"]
+        B2["place_order.php → placeOrder()\nBeginTransaction\nStock guard\nPrice re-read\nInsert rows\nCommit"]
+        B3["payment_return.php / payhere_notify.php\nVerify hash signature\nUpdate payment status"]
+    end
+
+    subgraph DATA["🗄️ Database Layer (MySQL)"]
+        D1[("cart\ncart_item")]
+        D2[("orders\norder_item")]
+        D3[("spare_part\n(stockQty decremented)")]
+        D4[("payment")]
+    end
+
+    subgraph OUTPUT["📄 Output / Response Layer"]
+        O1["cart.php — Updated cart view"]
+        O2["order_confirmation.php — Order summary"]
+        O3["receipt.php — Printable receipt"]
+        O4["my_orders.php — Order history"]
+    end
+
+    A1 --> B1
+    B1 -->|"Insert / Update row"| D1
+    B1 --> O1
+
+    A2 --> B2
+    B2 -->|"Read price & stock"| D3
+    B2 -->|"Insert order rows"| D2
+    B2 -->|"Decrement stockQty"| D3
+    B2 -->|"Create payment row"| D4
+    B2 -->|"Delete cart_item rows"| D1
+    B2 --> O2
+
+    A3 --> B3
+    B3 -->|"Update status"| D4
+    B3 -->|"Update order status"| D2
+    B3 --> O3
+    B3 --> O4
+
+    style INPUT fill:#2d3748,color:#e2e8f0
+    style LOGIC fill:#1a365d,color:#bee3f8
+    style DATA fill:#1c4532,color:#c6f6d5
+    style OUTPUT fill:#44337a,color:#e9d8fd
+```
+
+---
+
+## Admin Order Management Flow
+
+The following sequence shows how an admin processes, ships, and closes an order through the admin panel.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant OrderList as admin/orders/manage_orders.php
+    participant StatusHandler as update_order_status.php
+    participant RefundHandler as process_refund.php
+    participant DB as MySQL Database
+
+    Admin->>OrderList: Opens admin order list (filterable by status)
+    OrderList->>DB: SELECT orders with customer, total, payment status
+    DB-->>OrderList: Return paginated order rows
+    Admin->>OrderList: Clicks into a specific order
+
+    Admin->>StatusHandler: POST new status (e.g., Processing) + tracking number
+    StatusHandler->>DB: UPDATE orders SET status = ?, trackingNumber = ?
+    DB-->>StatusHandler: OK
+
+    Admin->>StatusHandler: POST status = Shipped
+    StatusHandler->>DB: UPDATE orders SET status = 'Shipped', shippedAt = NOW()
+
+    Admin->>StatusHandler: POST status = Cancelled (active order)
+    StatusHandler->>DB: Call restoreStockForOrder(orderID)
+    DB-->>StatusHandler: Stock incremented for each order_item
+
+    Admin->>RefundHandler: POST refund for a Success payment
+    RefundHandler->>DB: UPDATE payment SET status = 'Refunded', refundAmount = ?
+    DB-->>RefundHandler: OK
+    RefundHandler-->>Admin: Redirect to order with success notice
+```
+
+
 
