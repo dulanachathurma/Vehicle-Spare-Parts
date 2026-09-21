@@ -428,7 +428,38 @@ Four modules, roughly equal in size. Every feature in this system belongs to exa
 
 **Depends on:** Module 1's skeleton, and Module 2's catalogue being present so Add to Cart has somewhere to be called from. Build after Module 2.
 
+#### Implementation Notes & Critical Design Decisions
+
+**Race Condition Prevention in `place_order.php`**: The stock decrement SQL uses an atomic guarded update rather than a read-then-write pattern:
+```sql
+UPDATE spare_part SET stockQty = stockQty - ? WHERE partID = ? AND stockQty >= ?
+```
+If `affected_rows` returns 0, the transaction is rolled back immediately. This eliminates overselling even under concurrent load without requiring application-level locks.
+
+**Price Integrity at Checkout**: `ORDER_ITEM.unitPrice` is populated from a fresh database read at transaction time — never from a POST body or session variable. A customer cannot manipulate the unit price by modifying the form POST, because the server discards all POST price values and re-queries the current catalogue price before inserting the order row.
+
+**CSRF Protection**: `checkout.php` and `cancel_order.php` both call `csrfField()` from Module 1's `includes/functions.php` to embed a one-time token in the form, and `place_order.php` / `cancel_order.php` call `verifyCsrf()` before performing any mutation. A missing or replayed token results in a 403 response.
+
+**Cart Persistence Strategy**: The `cart` table uses `userID` as its foreign key rather than a session identifier. This means the cart is automatically restored when a verified customer logs in from any device or after their session expires.
+
+**`notify_url` vs `return_url` — Why Both Files Are Committed**: PayHere sends results via both browser redirect (`return_url`) and server-to-server POST (`notify_url`). On localhost, `notify_url` cannot be reached by PayHere's servers. The project handles this gracefully: `payment_return.php` performs the confirmation on localhost, and `payhere_notify.php` is fully implemented with hash verification, but is only the authoritative callback in a live deployment. Both files include inline comments documenting this distinction.
+
+**Admin Order Management and Dual Stock Restoration**: Two independent code paths can cancel an order — customer self-service (`cancel_order.php`) and admin action (`update_order_status.php`). Both call the shared `restoreStockForOrder()` helper from `order_helper.php`, ensuring stock is never double-restored or missed regardless of which path is used.
+
+#### Security Checklist (Module 3)
+
+| Security Control | Implementation | File |
+|---|---|---|
+| Price tamper prevention | Server-side price re-read at transaction time | `orders/place_order.php` |
+| Stock race condition guard | Atomic guarded `UPDATE` with `affected_rows` check | `orders/lib/order_helper.php` |
+| CSRF token validation | `verifyCsrf()` on all mutating endpoints | `orders/place_order.php`, `orders/cancel_order.php` |
+| Session authentication guard | `auth_guard.php` included at top of all order pages | All `orders/` pages |
+| PayHere hash verification | MD5 signature verified on both `return_url` and `notify_url` | `payment/lib/payment_helper.php` |
+| Credential isolation | Merchant ID and Secret in git-ignored `config.local.php` only | `config/config.local.php` |
+| SQL injection prevention | All queries use PDO prepared statements with bound parameters | All `orders/` and `payment/` files |
+
 ---
+
 
 ### MODULE 4 — Inventory Administration, Product Requests & DevOps
 **Owner: Chanindu Imanjith (SE/2023/022)**
