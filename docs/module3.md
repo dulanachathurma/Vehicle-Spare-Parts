@@ -368,3 +368,50 @@ hash = strtoupper( MD5(
 
 > **Security Note:** The `merchant_secret` is only stored in `config/config.local.php` which is git-ignored. It is never transmitted in the form or stored in the database. The `notify_url` callback from PayHere's servers also re-verifies this hash before updating any order record.
 
+---
+
+## Localhost vs Production Deployment Architecture
+
+A key architectural difference exists in how Module 3's payment callbacks are handled on WAMP (localhost) versus a live server.
+
+```mermaid
+flowchart LR
+    subgraph LOCAL["🖥️ WAMP Localhost Demo"]
+        direction TB
+        Browser["Customer Browser\nlocalhost:80"]
+        PayHereLS["PayHere Sandbox\nsandbox.payhere.lk"]
+        ReturnLS["payment_return.php\n✅ Reachable by browser"]
+        NotifyLS["payhere_notify.php\n❌ NOT reachable by PayHere servers\n(logs only)"]
+        Browser -->|"1. Form POST"| PayHereLS
+        PayHereLS -->|"2. return_url\nbrowser redirect"| ReturnLS
+        PayHereLS -. "3. notify_url\nserver POST (blocked)" .-> NotifyLS
+    end
+
+    subgraph PROD["☁️ Live Production Server"]
+        direction TB
+        BrowserP["Customer Browser"]
+        PayHereP["PayHere Sandbox\nsandbox.payhere.lk"]
+        ReturnP["payment_return.php\n✅ Confirmation (user visible)"]
+        NotifyP["payhere_notify.php\n✅ Authoritative confirmation\n(server-to-server)"]
+        BrowserP -->|"1. Form POST"| PayHereP
+        PayHereP -->|"2. return_url"| ReturnP
+        PayHereP -->|"3. notify_url\nauthoritative POST"| NotifyP
+    end
+
+    style LOCAL fill:#2d3748,color:#e2e8f0,stroke:#4a5568
+    style PROD fill:#1a365d,color:#bee3f8,stroke:#2b6cb0
+    style NotifyLS fill:#742a2a,color:#fff
+    style NotifyP fill:#1c4532,color:#fff
+```
+
+### ngrok Workaround for Localhost `notify_url` Testing
+
+To test the PayHere `notify_url` callback on a local machine, run ngrok to create a temporary public tunnel:
+
+```bash
+ngrok http 80
+```
+
+Then set the `notify_url` in `payhere_checkout.php` to the ngrok HTTPS URL (e.g., `https://abc123.ngrok.io/vehicle-spare-parts/payment/payhere_notify.php`). PayHere's servers can then reach the local machine and the server-to-server hash verification can be tested end-to-end.
+
+
