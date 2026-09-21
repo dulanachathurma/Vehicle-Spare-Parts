@@ -115,3 +115,78 @@
 `admin/gateways/manage_gateways.php`,
 `assets/css/orders.css`, `assets/js/cart.js`,
 `database/seed_gateways.sql`, `docs/module3.md`.
+
+---
+
+## Database Architecture & Entity Relationships
+
+The schema for Module 3 manages persistent user carts, atomic order records, line-item snapshots, and payment transactions.
+
+```mermaid
+erDiagram
+    USERS ||--o{ CART : owns
+    USERS ||--o{ ORDERS : places
+    CART ||--|{ CART_ITEM : contains
+    SPARE_PART ||--o{ CART_ITEM : references
+    ORDERS ||--|{ ORDER_ITEM : contains
+    SPARE_PART ||--o{ ORDER_ITEM : snapshots
+    ORDERS ||--|| PAYMENT : settles
+    PAYMENT_GATEWAY ||--o{ PAYMENT : processes
+
+    CART {
+        int cartID PK
+        int userID FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    CART_ITEM {
+        int cartItemID PK
+        int cartID FK
+        int partID FK
+        int quantity
+    }
+
+    ORDERS {
+        int orderID PK
+        int userID FK
+        decimal totalAmount
+        decimal subtotal
+        decimal taxAmount
+        varchar status
+        text shippingAddress
+        varchar trackingNumber
+        datetime orderDate
+    }
+
+    ORDER_ITEM {
+        int orderItemID PK
+        int orderID FK
+        int partID FK
+        int quantity
+        decimal unitPrice
+    }
+
+    PAYMENT {
+        int paymentID PK
+        int orderID FK
+        int gatewayID FK
+        decimal amount
+        varchar status
+        varchar transactionReference
+        datetime paymentDate
+    }
+
+    PAYMENT_GATEWAY {
+        int gatewayID PK
+        varchar gatewayName
+        varchar gatewayCode
+        boolean isActive
+    }
+```
+
+### Key Integrity Constraints:
+- **Price Freezing**: `ORDER_ITEM.unitPrice` captures a point-in-time price snapshot at checkout, ensuring catalog price changes never alter past order records.
+- **Cart Persistence**: `CART` and `CART_ITEM` survive logout and reconnect automatically when a verified customer logs back in.
+- **Atomic Foreign Keys**: Deleting or archiving parts does not orphan historical `ORDER_ITEM` records due to restricted delete foreign key rules.
+
